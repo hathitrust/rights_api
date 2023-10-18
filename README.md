@@ -3,6 +3,7 @@
 ## Initial Setup
 ```bash
 git clone https://github.com/hathitrust/rights_api
+docker-compose build
 docker-compose run --rm web bundle install
 docker-compose up
 ```
