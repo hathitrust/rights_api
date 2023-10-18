@@ -39,7 +39,7 @@ module RightsAPI
   def db_connection
     Services[:rights_database].db
   end
-  
+
   # Common code for querying rights or rights_log and returning results
   def rights_query(htid:, table:)
     namespace, id = htid.split(".", 2)
