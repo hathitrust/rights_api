@@ -4,6 +4,7 @@
 ```bash
 git clone https://github.com/hathitrust/rights_api
 docker-compose build
+docker-compose run --rm web bundle install
 docker-compose up
 ```
 
@@ -11,16 +12,16 @@ docker-compose up
 
 Visit `http://localhost:4567/` for a usage summary.
 ```
-http://localhost:4567/attributes
-http://localhost:4567/reasons
-http://localhost:4567/rights?htid=test.und_open
-
+http://localhost:4567/v1/attributes
+http://localhost:4567/v1/reasons
+http://localhost:4567/v1/rights/test.und_open
+http://localhost:4567/v1/rights_log/test.und_open
 ```
+See `lib/rights_api/app.rb` for all of the Sinatra routes.
 
 ## TODO
-- `rights_log` queries (requires changes to the rights_database gem)
-- `db-image` seeds for `rights_log` (currently empty)
+- Remove last vestiges of rights_database gem
 - `/rights?...` query parameters other than HTID (dates, for example)
+- `/rights_log?...` query parameters other than HTID (dates, for example)
 - Results paging
-- Add versioning to API routes
-- Think carefully about exposing `rights_current.user` and `rights_current.note` in a public API
+
