@@ -15,4 +15,4 @@ ENV APP_ENV production
 RUN bundle install
 COPY --chown=$UID:$GID . /usr/src/app
 
-CMD ["bundle", "exec", "ruby", "lib/rights_api/app.rb", "-o", "0.0.0.0"]
+CMD ["bundle", "exec", "rackup", "-p", "4567", "-o", "0.0.0.0"]
