@@ -1,11 +1,3 @@
-GIT
-  remote: https://github.com/hathitrust/rights_database.git
-  revision: 2d152f9e2079a7f2997de6cc9fdb783d5ee1f030
-  specs:
-    rights_database (0.1.0)
-      mysql2
-      sequel
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -116,11 +108,12 @@ PLATFORMS
 DEPENDENCIES
   canister
   json
+  mysql2
   pry
   puma
   rack-test
-  rights_database!
   rspec
+  sequel
   simplecov
   simplecov-lcov
   sinatra

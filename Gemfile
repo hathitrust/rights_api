@@ -2,8 +2,9 @@ source "https://rubygems.org"
 
 gem "canister"
 gem "json"
+gem "mysql2"
 gem "puma"
-gem "rights_database", github: "hathitrust/rights_database"
+gem "sequel"
 gem "sinatra"
 gem "sinatra-contrib"
 

@@ -3,6 +3,8 @@
 require "simplecov"
 require "simplecov-lcov"
 
+SimpleCov.add_filter "spec"
+
 SimpleCov::Formatter::LcovFormatter.config do |c|
   c.report_with_single_file = true
   c.single_report_path = "coverage/lcov.info"
@@ -114,4 +116,25 @@ end
 
 def app
   RightsAPI::App
+end
+
+# Temporarily manipulate ENV within a block.
+def ENV.with(**kwargs)
+  save_env = ENV.select { |k, _v| kwargs.key?(k.to_s) || kwargs.key?(k.to_sym) }
+  delete_env = kwargs.reject { |k, _v| ENV.key? k.to_s }
+  retval = nil
+  begin
+    kwargs.each do |k, v|
+      if v.nil?
+        ENV.delete k.to_s
+      else
+        ENV[k.to_s] = v
+      end
+    end
+    retval = yield if block_given?
+  ensure
+    save_env.each { |k, v| ENV[k] = v }
+    delete_env.each { |k, _v| ENV.delete k.to_s }
+  end
+  retval
 end
