@@ -17,7 +17,7 @@ module RightsAPI
     end
 
     get "/v1/?" do
-      json UsageResult.new.to_h
+      json Result.new.to_h
     end
 
     # The full-featured search

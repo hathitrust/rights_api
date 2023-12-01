@@ -6,15 +6,13 @@ require "logger"
 require_relative "error"
 require_relative "query_parser"
 require_relative "result"
+require_relative "schema"
 require_relative "services"
 
 module RightsAPI
   class Query
-    attr_reader :params, :table
+    attr_reader :params, :schema
 
-    # Queries rights_current or rights_log based on CGI params.
-    # Todo parse the query here so malformed URLs are caught in the initializer and
-    # 500s are raised from #run.
     def initialize(params:, schema:)
       @params = params.is_a?(String) ? CGI.parse(params) : params
       @schema = schema
@@ -26,7 +24,7 @@ module RightsAPI
     end
 
     def run
-      dataset = Services[:db_connection][@schema.table]
+      dataset = Services[:db_connection][schema.table]
       @parser.where.each do |where|
         dataset = dataset.where(where)
       end
