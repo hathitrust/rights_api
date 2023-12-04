@@ -5,6 +5,7 @@ require_relative "services"
 
 module RightsAPI
   class Query
+    DEFAULT_LIMIT = 1000
     attr_reader :schema
 
     def initialize(schema:)
@@ -18,6 +19,7 @@ module RightsAPI
         dataset = dataset.where(where)
       end
       dataset = dataset.order(schema.default_order)
+        .limit(DEFAULT_LIMIT)
       result = Result.new(total: dataset.count)
       dataset.each do |row|
         result.add! row: @schema.normalize_row(row)
