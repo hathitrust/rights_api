@@ -46,7 +46,7 @@ http://localhost:4567/v1/sources/1
 
 See `lib/rights_api/app.rb` for all of the Sinatra routes.
 
-## Result
+## Results
 
 All API results, even 404s (which should only occur with a bad Sinatra route) should return
 the same general JSON structure. Here's the empty variant:
