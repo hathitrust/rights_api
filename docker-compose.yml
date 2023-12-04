@@ -24,6 +24,7 @@ services:
     command: bash -c "/usr/local/bin/wait-for mariadb:3306 && bundle exec rspec"
     environment:
       RIGHTS_DATABASE_CONNECTION_STRING: "mysql2://ht_rights:ht_rights@mariadb/ht"
+      RIGHTS_API_NO_LOG: 1
     depends_on:
       - mariadb
 
