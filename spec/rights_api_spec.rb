@@ -39,7 +39,7 @@ RSpec.describe "RightsAPI" do
   end
 
   shared_examples "nonempty response" do
-    it "returns empty JSON with no error" do
+    it "returns nonempty JSON with no error" do
       expect(last_response).to be_ok
       expect(last_response.content_type).to eq("application/json")
       expect(valid_json?(last_response.body)).to be true
