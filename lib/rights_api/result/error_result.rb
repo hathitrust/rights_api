@@ -7,6 +7,8 @@ module RightsAPI
       @exception = exception
     end
 
+    private
+
     def finalize(hash)
       hash[:error] = @exception.to_s
       hash

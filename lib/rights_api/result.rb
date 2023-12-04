@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# Rights API return structure.
+# Typically initialized with the full dataset for the query,
+# and then data is populated according to the requested offset and limit.
 module RightsAPI
   class Result
     # @param [Integer] offset The offset=x URL parameter.
@@ -32,6 +35,8 @@ module RightsAPI
       }
       finalize h
     end
+
+    private
 
     # Override this to add any custom fields to the default ones.
     def finalize(hash)

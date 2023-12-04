@@ -21,7 +21,7 @@ module RightsAPI
     end
 
     # The full-featured search
-    Schema::NAME_TO_TABLE.keys.each do |name|
+    Schema.names.each do |name|
       get "/v1/#{name}/?" do
         params = CGI.parse(request.query_string)
         schema = Schema.named(name: name)
@@ -30,7 +30,7 @@ module RightsAPI
     end
 
     # The "by id" queries
-    Schema::NAME_TO_TABLE.keys.each do |name|
+    Schema.names.each do |name|
       get "/v1/#{name}/:id" do |id|
         schema = Schema.named(name: name)
         params = {schema.primary_key.to_s => [id]}

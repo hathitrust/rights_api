@@ -49,7 +49,7 @@ module RightsAPI
     end
 
     def parse_query_key(key, value)
-      key = @schema.transform_key key
+      key = @schema.query_for_field key
       op = OPERATORS.find { |op| value.start_with?(op) && value.length > op.length }
       if op
         value = value[op.length..]
@@ -79,7 +79,7 @@ module RightsAPI
     def parse_order(values)
       values.each do |value|
         key, dir = value.split(/\s+/, 2)
-        key = @schema.transform_key key.to_sym
+        key = @schema.query_for_field key.to_sym
         @order << if dir.nil? || dir.downcase == "asc"
           Sequel.asc key
         else

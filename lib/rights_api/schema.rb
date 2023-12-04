@@ -3,12 +3,19 @@
 require "sequel"
 require_relative "services"
 
+module RightsAPI
+  class Schema
+  end
+end
+require_relative "schema/access_statements_map_schema"
+require_relative "schema/access_statements_schema"
+require_relative "schema/rights_schema"
+
 # Information on the various tables and their contents.
 # Used mainly to translate between the more human-readable API keys
 # and their corresponding abbreviasted or SQLized counterparts.
 module RightsAPI
   class Schema
-    # FIXME: can we make this a private constant?
     NAME_TO_TABLE = {
       access_profiles: :access_profiles,
       access_statements: :access_stmts,
@@ -19,8 +26,13 @@ module RightsAPI
       rights_log: :rights_log,
       sources: :sources
     }.freeze
+    private_constant :NAME_TO_TABLE
 
     attr_reader :table
+
+    def self.names
+      NAME_TO_TABLE.keys.sort
+    end
 
     def self.named(name:)
       case name
@@ -46,7 +58,7 @@ module RightsAPI
     # @param [Hash] row
     # It should be fine to modify the row in-place.
     # Add, delete, modify the row data to make it conform to
-    # the expect structure, in particular:
+    # the expected structure, in particular:
     # - Delete fields that should not be exposed in a public API.
     # - Rename fields that derive from opaque, abbreviated, or oddball column names.
     # - Add derivative fields with foreign key URLs.
@@ -69,61 +81,14 @@ module RightsAPI
       :id
     end
 
-    # Transform an API search key (param) into a key
+    # Transform an API search field (param) into a query
     # that can be used in a SQL WHERE or ORDER BY.
-    def transform_key(key)
-      Sequel[key.to_sym]
+    def query_for_field(field)
+      Sequel[field.to_sym]
     end
 
     def default_order
-      transform_key primary_key
-    end
-  end
-
-  class AccessStatementsSchema < Schema
-    def primary_key
-      :stmt_key
-    end
-  end
-
-  class AccessStatementsMapSchema < Schema
-    # This allows for URLs like access_statements_map/pd.google
-    # in the spirit of namespace . id
-    def primary_key
-      :attr_access_id
-    end
-
-    def transform_key(key)
-      return Sequel.join [:a_attr, :a_access_profile], "." if key.to_sym == :attr_access_id
-      super key
-    end
-  end
-
-  class RightsSchema < Schema
-    # Add htid field based on namespace.id
-    # Keep note and user out of results for public API
-    def normalize_row(row)
-      row[:htid] = row[:namespace] + "." + row[:id]
-      row.delete :user
-      row.delete :note
-      row
-    end
-
-    def keys
-      super + [:htid] - [:user, :note]
-    end
-
-    def primary_key
-      :htid
-    end
-
-    def transform_key(key)
-      return Sequel.join [:namespace, :id], "." if key.to_sym == :htid
-      super key
-    end
-
-    def default_order
-      :time
+      query_for_field primary_key
     end
   end
 end
