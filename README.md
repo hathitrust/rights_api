@@ -46,6 +46,43 @@ http://localhost:4567/v1/sources/1
 
 See `lib/rights_api/app.rb` for all of the Sinatra routes.
 
+## Result
+
+All API results, even 404s (which should only occur with a bad Sinatra route) should return
+the same general JSON structure. Here's the empty variant:
+
+```JSON
+{
+  "total":0,
+  "start":0,
+  "end":0,
+  "data":[]
+}
+
+```
+`total` is the number of query results. `start` and `end` are the one-based indexes of the
+current `OFFSET, LIMIT` slice. (The zeroes here are the empty result special case.)
+`data` is an array of hashes, one hash per row.
+
+Here's a truncated result from `http://localhost:4567/v1/access_profiles`:
+
+```JSON
+{
+  "total":4,
+  "start":1,
+  "end":4,
+  "data":[
+    {
+      "id":1,
+      "name":"open",
+      "dscr":"Unrestricted image and full-volume download (e.g. Internet Archive)"
+    },
+    ...
+  ]
+}
+
+```
+
 ## TODO
 
 See DEV-990
