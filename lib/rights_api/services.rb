@@ -9,11 +9,13 @@ module RightsAPI
     RightsDatabase
   end
 
+  Services.register(:logger) do
+    Logger.new($stdout, level: (ENV["RIGHTS_API_LOGGER_LEVEL"].to_i || Logger::WARN))
+  end
+
   Services.register(:db_connection) do
-    connection = Services[:rights_database].connect
-    unless ENV["RIGHTS_API_NO_LOG"]
-      connection.logger = Logger.new($stdout)
+    Services[:rights_database].connect.tap do |connection|
+      connection.logger = Services[:logger]
     end
-    connection
   end
 end
