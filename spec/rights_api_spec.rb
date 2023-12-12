@@ -3,11 +3,10 @@ require "rack/test"
 
 STANDARD_TABLES = %w[attributes access_profiles access_statements access_statements_map reasons sources]
 
-def valid_identifier_for_table(name)
-  return "pd" if name == "access_statements"
-  return "pd.google" if name == "access_statements_map"
-  "1"
-end
+valid_identifier_for_table = {
+  "access_statements" => "pd",
+  "access_statements_map" => "pd.google"
+}.tap { |h| h.default = 1 }
 
 RSpec.describe "RightsAPI" do
   include Rack::Test::Methods
@@ -79,7 +78,7 @@ RSpec.describe "RightsAPI" do
   STANDARD_TABLES.each do |table|
     describe "/#{table}/:id" do
       context "with a valid identifier" do
-        identifier = valid_identifier_for_table(table)
+        identifier = valid_identifier_for_table[table]
         before(:each) { get(rights_api_endpoint + table + "/#{identifier}") }
         it_behaves_like "valid response"
       end
