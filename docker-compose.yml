@@ -13,6 +13,7 @@ services:
     command: bundle exec rackup --host 0.0.0.0 -p 4567
     environment:
       RIGHTS_DATABASE_CONNECTION_STRING: "mysql2://ht_rights:ht_rights@mariadb/ht"
+      RIGHTS_API_LOGGER_LEVEL: 1 # Logger::INFO
     depends_on:
       - mariadb
 

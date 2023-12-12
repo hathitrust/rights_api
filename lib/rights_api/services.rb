@@ -8,4 +8,14 @@ module RightsAPI
   Services.register(:rights_database) do
     RightsDatabase
   end
+
+  Services.register(:logger) do
+    Logger.new($stdout, level: ENV.fetch("RIGHTS_API_LOGGER_LEVEL", Logger::WARN).to_i)
+  end
+
+  Services.register(:db_connection) do
+    Services[:rights_database].connect.tap do |connection|
+      connection.logger = Services[:logger]
+    end
+  end
 end
