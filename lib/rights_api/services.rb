@@ -10,7 +10,7 @@ module RightsAPI
   end
 
   Services.register(:logger) do
-    Logger.new($stdout, level: (ENV["RIGHTS_API_LOGGER_LEVEL"].to_i || Logger::WARN))
+    Logger.new($stdout, level: ENV.fetch("RIGHTS_API_LOGGER_LEVEL", Logger::WARN).to_i)
   end
 
   Services.register(:db_connection) do
