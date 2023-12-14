@@ -6,6 +6,7 @@ module RightsAPI
   class Schema
   end
 end
+
 require_relative "schema/access_statements_map_schema"
 require_relative "schema/access_statements_schema"
 require_relative "schema/rights_schema"
@@ -25,7 +26,14 @@ module RightsAPI
       rights_log: :rights_log,
       sources: :sources
     }.freeze
-    private_constant :NAME_TO_TABLE
+
+    EXPANSIONS = {
+      "attr" => "attribute",
+      "dscr" => "description",
+      "stmt" => "statement"
+    }.freeze
+
+    private_constant :NAME_TO_TABLE, :EXPANSIONS
 
     attr_reader :table
 
@@ -33,31 +41,44 @@ module RightsAPI
       NAME_TO_TABLE.keys.sort
     end
 
+    # @param name [String, Symbol] A table name
     def self.named(name:)
-      case name
-      when :rights, :rights_log
-        RightsSchema
+      case name.to_sym
       when :access_statements
         AccessStatementsSchema
       when :access_statements_map
         AccessStatementsMapSchema
+      when :rights, :rights_log
+        RightsSchema
       else
         Schema
       end.new(table: NAME_TO_TABLE[name])
     end
 
+    # @param table [String, Symbol]
     def initialize(table:)
       @table = table.to_sym
     end
 
-    # @param [Hash] row
     # It should be fine to modify the row in-place.
     # Add, delete, modify the row data to make it conform to
     # the expected structure, in particular:
     # - Delete fields that should not be exposed in a public API.
     # - Rename fields that derive from opaque, abbreviated, or oddball column names.
     # - Add derivative fields with foreign key URLs.
-    def normalize_row(row)
+    # Default implementation de-abbreviates common abbreviations.
+    # @param row [Hash<Symbol, Object>] A table row to modify in place
+    # @return [Hash<Symbol, Object>] The row that was passed
+    def normalize_row(row:)
+      row.keys.each do |key|
+        EXPANSIONS.each_key do |abbrev|
+          if key.match? abbrev
+            new_key = key.to_s.sub(abbrev, EXPANSIONS[abbrev]).to_sym
+            row[new_key] = row[key]
+            row.delete key
+          end
+        end
+      end
       row
     end
 
@@ -66,19 +87,23 @@ module RightsAPI
     # the MySQL schema. rights_current.htid is an artificially-named actual
     # primary key, whereas access_stmts_map does not have a primary key
     # at all so we use the concatrnation of attr + / + access_profile
+    # @return [Symbol]
     def primary_key
       :id
     end
 
-    # Transform an API search field (param) into a query
+    # Transform an API search field (param) into a Sequel expression
     # that can be used in a SQL WHERE or ORDER BY.
-    def query_for_field(field)
+    # @param field [String, Symbol]
+    # @return [Sequel::SQL::Expression]
+    def query_for_field(field:)
       Sequel[field.to_sym]
     end
 
     # For use in ORDER BY clause.
+    # @return [Sequel::SQL::Expression]
     def default_order
-      query_for_field primary_key
+      query_for_field field: primary_key
     end
   end
 end

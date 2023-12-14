@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "canister"
+require "logger"
 require "rights_database"
 
 module RightsAPI
