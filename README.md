@@ -93,6 +93,18 @@ Here's a truncated result from `http://localhost:4567/v1/access_profiles`:
 }
 
 ```
+## Testing
+The test suite is divided into unit and integration tests which can be run separately to give some orthogonality in checking for coverage gaps.
+```
+# Full test suite
+docker-compose run --rm test
+# Standard
+docker-compose run --rm test bundle exec standardrb
+# Unit
+docker-compose run --rm test bundle exec rspec spec/unit
+# Integration
+docker-compose run --rm test bundle exec rspec spec/integration
+```
 
 ## TODO
 
