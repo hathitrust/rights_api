@@ -3,6 +3,28 @@
 require "rack/test"
 require "shared_examples"
 
+SUPPORT_TABLES = %w[
+  attributes
+  access_profiles
+  access_statements
+  access_statements_map
+  reasons
+  sources
+]
+
+SUPPORT_TABLES.each do |table|
+  RSpec.shared_examples "nonempty #{table} response" do
+    it_behaves_like "nonempty response"
+    it "has valid #{table} data" do
+      response = parse_json(last_response.body)
+      response[:data].each do |row|
+        validator = "validate_#{table}_row".to_sym
+        send validator, row
+      end
+    end
+  end
+end
+
 valid_identifier_for_table = {
   "access_statements" => "pd",
   "access_statements_map" => "pd.google"
