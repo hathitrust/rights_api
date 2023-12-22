@@ -4,37 +4,55 @@ require "sequel"
 
 module RightsAPI
   RSpec.describe(RightsSchema) do
-    let(:schema) { described_class.new(table: :access_statements_map) }
-    let(:unnormalized_row) { {namespace: "test", id: "001", attr: 1, user: "someone", note: "a note"} }
-    let(:normalized_row) { {namespace: "test", id: "001", attribute: 1, htid: "test.001"} }
-
-    describe "#normalize_row" do
-      it "adds htid and removes user, note" do
-        expect(schema.normalize_row(row: unnormalized_row)).to eq(normalized_row)
-      end
-
-      it "returns the same object" do
-        expect(schema.normalize_row(row: unnormalized_row)).to be(unnormalized_row)
-      end
-    end
+    let(:row_data) {
+      {
+        namespace: "test",
+        id: "001",
+        attr: 1,
+        reason: 1,
+        source: 1,
+        access_profile: 1,
+        user: "someone",
+        note: "a note",
+        time: "2018-01-01 12:00:00"
+      }
+    }
+    let(:hash_data) {
+      {
+        namespace: "test",
+        id: "001",
+        htid: "test.001",
+        attribute: 1,
+        reason: 1,
+        source: 1,
+        access_profile: 1,
+        time: "2018-01-01 12:00:00"
+      }
+    }
 
     describe "#primary_key" do
       it "returns a Symbol" do
-        expect(schema.primary_key).to be_an_instance_of(Symbol)
+        expect(described_class.primary_key).to be_an_instance_of(Symbol)
       end
     end
 
     describe "#query_for_field" do
       context "with primary key" do
         it "returns a Sequel string expression" do
-          expect(schema.query_for_field(field: schema.primary_key)).to be_an_instance_of(Sequel::SQL::StringExpression)
+          expect(described_class.query_for_field(field: described_class.primary_key)).to be_an_instance_of(Sequel::SQL::StringExpression)
         end
       end
 
       context "with non-primary key" do
         it "returns a Sequel expression" do
-          expect(schema.query_for_field(field: :some_field)).to be_a_kind_of(Sequel::SQL::Expression)
+          expect(described_class.query_for_field(field: :some_field)).to be_a_kind_of(Sequel::SQL::Expression)
         end
+      end
+    end
+
+    describe "#to_h" do
+      it "returns expected structure" do
+        expect(described_class.new(row: row_data).to_h).to eq(hash_data)
       end
     end
   end

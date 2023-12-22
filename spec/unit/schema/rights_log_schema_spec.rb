@@ -3,25 +3,42 @@
 require "sequel"
 
 module RightsAPI
-  RSpec.describe(AccessStatementsMapSchema) do
+  RSpec.describe(RightsLogSchema) do
     let(:row_data) {
       {
-        a_attr: "test_a_attr",
-        a_access_profile: "test_a_access_profile",
-        stmt_key: "test_stmt_key"
+        namespace: "test",
+        id: "001",
+        attr: 1,
+        reason: 1,
+        source: 1,
+        access_profile: 1,
+        user: "someone",
+        note: "a note",
+        time: "2018-01-01 12:00:00"
       }
     }
     let(:hash_data) {
       {
-        attribute: "test_a_attr",
-        access_profile: "test_a_access_profile",
-        statement_key: "test_stmt_key"
+        namespace: "test",
+        id: "001",
+        htid: "test.001",
+        attribute: 1,
+        reason: 1,
+        source: 1,
+        access_profile: 1,
+        time: "2018-01-01 12:00:00"
       }
     }
 
     describe "#primary_key" do
       it "returns a Symbol" do
         expect(described_class.primary_key).to be_an_instance_of(Symbol)
+      end
+    end
+
+    describe "#default_order" do
+      it "returns timestamp" do
+        expect(described_class.default_order).to be(:time)
       end
     end
 

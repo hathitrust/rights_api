@@ -4,16 +4,11 @@ require "sequel"
 
 module RightsAPI
   RSpec.describe(Query) do
-    let(:schema) { Schema.named(name: :rights) }
-    let(:query) { described_class.new(schema: schema) }
+    let(:query) { described_class.new(table_name: "rights") }
 
     describe ".new" do
       it "creates a Query" do
         expect(query).to be_an_instance_of(described_class)
-      end
-
-      it "exposes its schema" do
-        expect(query.schema).to eq(schema)
       end
     end
 
