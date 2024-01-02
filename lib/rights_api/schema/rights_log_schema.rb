@@ -4,7 +4,7 @@ require "sequel"
 
 # Schema subclass for ht_rights.rights_log
 module RightsAPI
-  class RightsSchema < Schema
+  class RightsLogSchema < Schema
     KEY_TO_QUERY = {
       attribute: :attr
     }

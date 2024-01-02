@@ -1,13 +1,12 @@
 # frozen_string_literal: true
 
-require "cgi"
 require "sinatra"
 require "sinatra/json"
 require "sinatra/reloader" if development?
 
+require_relative "schema"
 require_relative "query"
 require_relative "result"
-require_relative "schema"
 
 module RightsAPI
   class App < Sinatra::Base
@@ -24,24 +23,28 @@ module RightsAPI
     Schema.names.each do |name|
       get "/v1/#{name}/?" do
         params = CGI.parse(request.query_string)
-        schema = Schema.named(name: name)
-        do_query(params: params, schema: schema)
+        do_query(params: params, table_name: name)
       end
     end
 
     # The "by id" queries
     Schema.names.each do |name|
       get "/v1/#{name}/:id" do |id|
-        schema = Schema.named(name: name)
-        params = {schema.primary_key.to_s => [id]}
-        do_query(params: params, schema: schema)
+        schema_class = Schema.class_for name: name
+        params = {schema_class.primary_key.to_s => [id]}
+        do_query(params: params, table_name: name)
       end
     end
 
+    # This masks possible errors too effectively
+    # error 400..404 do
+    #  json Result.new.to_h
+    # end
+
     private
 
-    def do_query(params:, schema:)
-      query = Query.new(params: params, schema: schema)
+    def do_query(table_name:, params: {})
+      query = Query.new(params: params, table_name: table_name)
       json query.run.to_h
     rescue QueryParserError, Sequel::Error => e
       status 400

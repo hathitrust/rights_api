@@ -21,4 +21,10 @@ RSpec.describe "RightsAPI" do
       expect(last_response.location).to match(/v1/)
     end
   end
+
+  describe "unknown route" do
+    before(:each) { get(rights_api_endpoint + "no_such_route") }
+
+    it_behaves_like "404 response"
+  end
 end

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "canister"
-# require "rights_database"
 require_relative "database"
 
 module RightsAPI
@@ -11,11 +10,13 @@ module RightsAPI
     Database.new
   end
 
+  Services.register(:logger) do
+    Logger.new($stdout, level: ENV.fetch("RIGHTS_API_LOGGER_LEVEL", Logger::WARN).to_i)
+  end
+
   Services.register(:db_connection) do
-    connection = Services[:rights_database].connect
-    unless ENV["RIGHTS_API_NO_LOG"]
-      connection.logger = Logger.new($stdout)
+    Services[:rights_database].connect.tap do |connection|
+      connection.logger = Services[:logger]
     end
-    connection
   end
 end

@@ -6,12 +6,13 @@ require_relative "error"
 
 module RightsAPI
   class QueryParser
-    attr_reader :params, :where, :order, :page_size, :offset, :limit
+    attr_reader :params, :schema_class, :where, :order, :page_size, :offset, :limit
 
-    # params can be a Hash for a string
-    def initialize(params:, schema:)
+    # @param params [Hash] CGI parameters of the form {"key" => ["value1", ...], ...}
+    # @param schema_class [Class] Schema subclass for the table being queried
+    def initialize(params:, schema_class:)
       @params = params
-      @schema = schema
+      @schema_class = schema_class
       @where = []
       @order = []
       @limit = 1000
@@ -30,80 +31,83 @@ module RightsAPI
         key = key.to_sym
         case key
         when :order
-          parse_order values
+          parse_order(values: values)
         when :offset
-          parse_offset values
+          parse_offset(values: values)
         when :limit
-          parse_limit values
-        when *@schema.keys
+          parse_limit(values: values)
+        else
           values.each do |value|
-            clause = parse_query_key(key, value)
+            clause = parse_parameter(key: key, value: value)
             @where << clause
           end
-        else
-          raise QueryParserError, "unknown query key '#{key}'"
         end
       end
-      @order = [@schema.default_order] if @order.empty?
+      @order = [schema_class.default_order] if @order.empty?
       # @where = [{1 => 1}] if @where.empty?
     end
 
-    def parse_query_key(key, value)
-      key = @schema.query_for_field key
+    def parse_parameter(key:, value:)
+      query = schema_class.query_for_key(key: key.to_sym)
       op = OPERATORS.find { |op| value.start_with?(op) && value.length > op.length }
       if op
         value = value[op.length..]
         case op
         when "!"
-          Sequel.~(key => value)
+          Sequel.~(query => value)
         when ">="
-          key >= value
+          query >= value
         when ">"
-          key > value
+          query > value
         when "<="
-          key <= value
+          query <= value
         when "<"
-          key < value
-        else
-          raise QueryParserError, "unknown operator #{op}"
+          query < value
         end
       else
         if (match = value.match(/\s*\[(.+?)\]\s*/))
           value = match[1].gsub(/\s+/, "").split(/\s*,\s*/)
         end
-        {key => value}
+        {query => value}
       end
     end
 
     # Raturn Array that can be passed as params to .order
-    def parse_order(values)
+    def parse_order(values:)
       values.each do |value|
         key, dir = value.split(/\s+/, 2)
-        key = @schema.query_for_field key.to_sym
+        query = schema_class.query_for_key(key: key.to_sym)
         @order << if dir.nil? || dir.downcase == "asc"
-          Sequel.asc key
+          Sequel.asc(query)
         else
-          Sequel.desc key
+          Sequel.desc(query)
         end
       end
     end
 
     # Raturn single integer that can be passed to #offset.
-    # If multiple values, use the last.
-    def parse_offset(values)
-      @offset = values.last.to_i
+    def parse_offset(values:)
+      @offset = parse_int_value(values: values, type: :offset)
     end
 
     # Raturn single integer that can be passed to #limit.
+    def parse_limit(values:)
+      @limit = parse_int_value(values: values, type: :limit)
+    end
+
+    # Extract integer offset= or limit= value from potentially multiple values.
     # If multiple values, use the last.
-    def parse_limit(values)
-      limit = values.last.to_i
-      # Make sure the limit can make a round-trip conversion between Int and String
+    # @param values [Array] One or more offset or limit values
+    # @param type [Symbol] :offset or :limit
+    # @return [Integer]
+    def parse_int_value(values:, type:)
+      value = values.last.to_i
+      # Make sure the offset can make a round-trip conversion between Int and String
       # https://stackoverflow.com/a/1235891
-      if limit.to_s != values.last
-        raise QueryParserError, "limit expression '#{values.last}' is not an integer"
+      if value.to_s != values.last
+        raise QueryParserError, "#{type} expression '#{values.last}' is not an integer"
       end
-      @limit = limit
+      value
     end
   end
 end

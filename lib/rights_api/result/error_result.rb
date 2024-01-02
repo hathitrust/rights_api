@@ -10,7 +10,7 @@ module RightsAPI
     private
 
     def finalize(hash)
-      hash[:error] = @exception.to_s
+      hash[:error] = @exception.to_s + " #{@exception.backtrace}"
       hash
     end
   end
