@@ -5,8 +5,10 @@
 # and then data is populated according to the requested offset and limit.
 module RightsAPI
   class Result
-    # @param [Integer] offset The offset=x URL parameter.
-    # @param [Integer] total The total number of result, regardless of paging.
+    attr_reader :offset, :total, :start, :end, :data
+
+    # @param offset [Integer] The offset=x URL parameter.
+    # @param total [Integer] The total number of results, regardless of paging.
     def initialize(offset: 0, total: 0)
       @offset = offset
       @total = total
@@ -16,7 +18,8 @@ module RightsAPI
     end
 
     # Add a row from the Sequel query.
-    # @param [Hash] row A row of data from a Sequel query
+    # @param row [Hash] A row of data from a Sequel query
+    # @return [self]
     def add!(row:)
       if @data.empty?
         @start = @offset + 1
@@ -25,8 +28,10 @@ module RightsAPI
         @end += 1
       end
       @data << row
+      self
     end
 
+    # @return [Hash<String, Object>]
     def to_h
       h = {
         "total" => @total,
@@ -40,6 +45,7 @@ module RightsAPI
     private
 
     # Override this to add any custom fields to the default ones.
+    # @return [Hash<String, Object>]
     def finalize(hash)
       hash
     end

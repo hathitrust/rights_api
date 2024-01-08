@@ -22,27 +22,26 @@ module RightsAPI
     # The full-featured search
     Schema.names.each do |name|
       get "/v1/#{name}/?" do
-        schema = Schema.named(name: name)
-        do_query(schema: schema)
+        do_query(table_name: name)
       end
     end
 
     # The "by id" queries
     Schema.names.each do |name|
       get "/v1/#{name}/:id" do |id|
-        schema = Schema.named(name: name)
-        do_query(schema: schema, id: id)
+        do_query(table_name: name, id: id)
       end
     end
 
-    error 400..404 do
-      json Result.new.to_h
-    end
+    # This masks possible errors too effectively
+    # error 400..404 do
+    #  json Result.new.to_h
+    # end
 
     private
 
-    def do_query(schema:, id: nil)
-      query = Query.new(schema: schema)
+    def do_query(table_name:, id: nil)
+      query = Query.new(table_name: table_name)
       json query.run(id: id).to_h
     end
   end

@@ -3,6 +3,8 @@
 require "simplecov"
 require "simplecov-lcov"
 
+SimpleCov.add_filter "spec"
+
 SimpleCov::Formatter::LcovFormatter.config do |c|
   c.report_with_single_file = true
   c.single_report_path = "coverage/lcov.info"
@@ -114,4 +116,12 @@ end
 
 def app
   RightsAPI::App
+end
+
+def parse_json(json)
+  JSON.parse(json, symbolize_names: true)
+end
+
+def rights_api_endpoint
+  "/v1/"
 end

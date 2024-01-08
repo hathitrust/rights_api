@@ -9,6 +9,17 @@ docker-compose run --rm web bundle install
 docker-compose up -d
 ```
 
+## Naming Conventions
+
+- The Rights Database is replete with abbreviations. Field and table names exposed
+  by this API are de-abbreviated:
+  - "attr" becomes "attribute"
+  - "dscr" becomes "description"
+  - "stmt" becomes "statement"
+- Spurious prefixes are eliminated:
+  - `a_attr` and `a_access_profile` become `attr` and `access_profile` (`attr` is further de-abbreviated as above)
+- For the sake of brevity, `rights_current` (the star of the show) is exposed as `rights` in URLs.
+
 ## Examples
 
 ### "All Items" Queries
@@ -75,12 +86,24 @@ Here's a truncated result from `http://localhost:4567/v1/access_profiles`:
     {
       "id":1,
       "name":"open",
-      "dscr":"Unrestricted image and full-volume download (e.g. Internet Archive)"
+      "description":"Unrestricted image and full-volume download (e.g. Internet Archive)"
     },
     ...
   ]
 }
 
+```
+## Testing
+The test suite is divided into unit and integration tests which can be run separately to give some orthogonality in checking for coverage gaps.
+```
+# Full test suite
+docker-compose run --rm test
+# Standard
+docker-compose run --rm test bundle exec standardrb
+# Unit
+docker-compose run --rm test bundle exec rspec spec/unit
+# Integration
+docker-compose run --rm test bundle exec rspec spec/integration
 ```
 
 ## TODO

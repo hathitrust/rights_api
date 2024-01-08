@@ -2,9 +2,9 @@
 
 require "sequel"
 
-# Schema subclass for ht_rights.rights_current
+# Schema subclass for ht_rights.rights_log
 module RightsAPI
-  class RightsSchema < Schema
+  class RightsLogSchema < Schema
     # @return [Symbol]
     def self.primary_key
       :htid
@@ -43,9 +43,6 @@ module RightsAPI
         id: @id,
         htid: @namespace + "." + @id,
         attribute: @attr,
-        # For DEV-1008 we might test something like this
-        # before implementing as a JOIN for the sake of efficiency.
-        # attribute: Query.new(table_name: :attributes).run(id: @attr).data[0],
         reason: @reason,
         source: @source,
         access_profile: @access_profile,

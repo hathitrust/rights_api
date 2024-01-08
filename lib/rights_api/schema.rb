@@ -6,59 +6,46 @@ module RightsAPI
   class Schema
   end
 end
+
+require_relative "schema/access_profiles_schema"
 require_relative "schema/access_statements_map_schema"
 require_relative "schema/access_statements_schema"
+require_relative "schema/attributes_schema"
+require_relative "schema/reasons_schema"
 require_relative "schema/rights_schema"
+require_relative "schema/rights_log_schema"
+require_relative "schema/sources_schema"
 
 # Information on the various tables and their contents.
 # Used mainly to translate between the more human-readable API keys
 # and their corresponding abbreviasted or SQLized counterparts.
 module RightsAPI
   class Schema
-    NAME_TO_TABLE = {
-      access_profiles: :access_profiles,
-      access_statements: :access_stmts,
-      access_statements_map: :access_stmts_map,
-      attributes: :attributes,
-      reasons: :reasons,
-      rights: :rights_current,
-      rights_log: :rights_log,
-      sources: :sources
+    SCHEMA_DATA = {
+      access_profiles: {table_name: :access_profiles, schema_class: AccessProfilesSchema},
+      access_statements: {table_name: :access_stmts, schema_class: AccessStatementsSchema},
+      access_statements_map: {table_name: :access_stmts_map, schema_class: AccessStatementsMapSchema},
+      attributes: {table_name: :attributes, schema_class: AttributesSchema},
+      reasons: {table_name: :reasons, schema_class: ReasonsSchema},
+      rights: {table_name: :rights_current, schema_class: RightsSchema},
+      rights_log: {table_name: :rights_log, schema_class: RightsLogSchema},
+      sources: {table_name: :sources, schema_class: SourcesSchema}
     }.freeze
-    private_constant :NAME_TO_TABLE
 
-    attr_reader :table
+    private_constant :SCHEMA_DATA
 
     def self.names
-      NAME_TO_TABLE.keys.sort
+      SCHEMA_DATA.keys.sort
     end
 
-    def self.named(name:)
-      case name
-      when :rights, :rights_log
-        RightsSchema
-      when :access_statements
-        AccessStatementsSchema
-      when :access_statements_map
-        AccessStatementsMapSchema
-      else
-        Schema
-      end.new(table: NAME_TO_TABLE[name])
+    # @param name [String, Symbol] A table name
+    def self.class_for(name:)
+      SCHEMA_DATA[name.to_sym][:schema_class]
     end
 
-    def initialize(table:)
-      @table = table.to_sym
-    end
-
-    # @param [Hash] row
-    # It should be fine to modify the row in-place.
-    # Add, delete, modify the row data to make it conform to
-    # the expected structure, in particular:
-    # - Delete fields that should not be exposed in a public API.
-    # - Rename fields that derive from opaque, abbreviated, or oddball column names.
-    # - Add derivative fields with foreign key URLs.
-    def normalize_row(row)
-      row
+    # @param name [String, Symbol] A table name
+    def self.table_for(name:)
+      SCHEMA_DATA[name.to_sym][:table_name]
     end
 
     # Subclass note:
@@ -66,19 +53,27 @@ module RightsAPI
     # the MySQL schema. rights_current.htid is an artificially-named actual
     # primary key, whereas access_stmts_map does not have a primary key
     # at all so we use the concatrnation of attr + / + access_profile
-    def primary_key
+    # @return [Symbol]
+    def self.primary_key
       :id
     end
 
-    # Transform an API search field (param) into a query
+    # Transform an API search field (param) into a Sequel expression
     # that can be used in a SQL WHERE or ORDER BY.
-    def query_for_field(field)
+    # @param field [String, Symbol]
+    # @return [Sequel::SQL::Expression]
+    def self.query_for_field(field:)
       Sequel[field.to_sym]
     end
 
     # For use in ORDER BY clause.
-    def default_order
-      query_for_field primary_key
+    # @return [Sequel::SQL::Expression]
+    def self.default_order
+      query_for_field field: primary_key
     end
+
+    # def initialize(row:)
+    #   raise "Do not instantiate Schema directly."
+    # end
   end
 end
