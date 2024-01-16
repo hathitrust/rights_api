@@ -32,12 +32,14 @@ RSpec.describe RightsAPI::Database do
     end
 
     it "connects with ENV variables" do
-      env = {RIGHTS_API_DATABASE_CONNECTION_STRING: nil,
-             RIGHTS_API_DATABASE_USER: "ht_rights",
-             RIGHTS_API_DATABASE_PASSWORD: "ht_rights",
-             RIGHTS_API_DATABASE_HOST: "mariadb",
-             RIGHTS_API_DATABASE_DATABASE: "ht",
-             RIGHTS_API_DATABASE_ADAPTER: "mysql2"}
+      env = {
+        RIGHTS_API_DATABASE_CONNECTION_STRING: nil,
+        RIGHTS_API_DATABASE_USER: "ht_rights",
+        RIGHTS_API_DATABASE_PASSWORD: "ht_rights",
+        RIGHTS_API_DATABASE_HOST: "mariadb",
+        RIGHTS_API_DATABASE_DATABASE: "ht",
+        RIGHTS_API_DATABASE_ADAPTER: "mysql2"
+      }
       ClimateControl.modify(**env) do
         expect(described_class.new.connect).not_to be nil
       end
