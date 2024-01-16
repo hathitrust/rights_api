@@ -12,7 +12,7 @@ services:
       - gem_cache:/gems
     command: bundle exec rackup --host 0.0.0.0 -p 4567
     environment:
-      RIGHTS_DATABASE_CONNECTION_STRING: "mysql2://ht_rights:ht_rights@mariadb/ht"
+      RIGHTS_API_DATABASE_CONNECTION_STRING: "mysql2://ht_rights:ht_rights@mariadb/ht"
       RIGHTS_API_LOGGER_LEVEL: 1 # Logger::INFO
     depends_on:
       - mariadb
@@ -24,7 +24,7 @@ services:
       - gem_cache:/gems
     command: bash -c "/usr/local/bin/wait-for mariadb:3306 && bundle exec rspec"
     environment:
-      RIGHTS_DATABASE_CONNECTION_STRING: "mysql2://ht_rights:ht_rights@mariadb/ht"
+      RIGHTS_API_DATABASE_CONNECTION_STRING: "mysql2://ht_rights:ht_rights@mariadb/ht"
     depends_on:
       - mariadb
 
