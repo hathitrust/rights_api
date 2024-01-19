@@ -4,10 +4,10 @@ require "rack/test"
 require "shared_examples"
 
 SUPPORT_TABLES = %w[
-  attributes
   access_profiles
   access_statements
   access_statements_map
+  attributes
   reasons
   sources
 ]

@@ -17,7 +17,7 @@ module RightsAPI
     # @return [Result]
     def run(id:)
       schema_class = Schema.class_for name: table_name
-      dataset = Services[:db_connection][Schema.table_for name: table_name]
+      dataset = Services[:database_connection][Schema.table_for name: table_name]
       if id
         where = {schema_class.query_for_field(field: schema_class.primary_key) => id}
         dataset = dataset.where(where)
