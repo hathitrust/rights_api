@@ -15,19 +15,18 @@ module RightsAPI
 
     # @param id [String] The primary value to retrieve, or nil for all rows.
     # @return [Result]
-    def run(id:)
-      schema_class = Schema.class_for name: table_name
-      dataset = Services[:database_connection][Schema.table_for name: table_name]
+    def run(id: nil)
+      model = Schema.model_for name: table_name
+      dataset = model.base_dataset
       if id
-        where = {schema_class.query_for_field(field: schema_class.primary_key) => id}
+        where = {model.query_for_field(field: model.default_key) => id}
         dataset = dataset.where(where)
       end
-      dataset = dataset.order(schema_class.default_order)
-        .limit(DEFAULT_LIMIT)
+      dataset = dataset.order(model.default_order)
+        .limit(DEFAULT_LIMIT).all
       result = Result.new(total: dataset.count)
       dataset.each do |row|
-        schema_row = schema_class.new(row: row)
-        result.add! row: schema_row.to_h
+        result.add! row: row.to_h
       end
       result
     end
