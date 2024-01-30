@@ -25,7 +25,7 @@ module RightsAPI
 
     describe "#default_key" do
       it "returns a Symbol" do
-        expect(described_class.default_key).to be_an_instance_of(Symbol)
+        expect(described_class.default_key).to be_a(Symbol)
       end
     end
 
@@ -38,7 +38,7 @@ module RightsAPI
     describe "#query_for_field" do
       context "with default key" do
         it "returns a Sequel string expression" do
-          expect(described_class.query_for_field(field: described_class.default_key)).to be_an_instance_of(Sequel::SQL::StringExpression)
+          expect(described_class.query_for_field(field: described_class.default_key)).to be_a(Sequel::SQL::StringExpression)
         end
       end
 

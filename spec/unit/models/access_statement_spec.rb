@@ -24,7 +24,7 @@ module RightsAPI
 
     describe "#default_key" do
       it "returns a Symbol" do
-        expect(described_class.default_key).to be_an_instance_of(Symbol)
+        expect(described_class.default_key).to be_a(Symbol)
       end
     end
 
