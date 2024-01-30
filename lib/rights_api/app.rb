@@ -4,9 +4,13 @@ require "sinatra"
 require "sinatra/json"
 require "sinatra/reloader" if development?
 
-require_relative "schema"
+require_relative "services"
+# So Sequel knows where to look.
+RightsAPI::Services[:database_connection]
+
 require_relative "query"
 require_relative "result"
+require_relative "schema"
 
 module RightsAPI
   class App < Sinatra::Base
@@ -32,11 +36,6 @@ module RightsAPI
         do_query(table_name: name, id: id)
       end
     end
-
-    # This masks possible errors too effectively
-    # error 400..404 do
-    #  json Result.new.to_h
-    # end
 
     private
 

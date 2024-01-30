@@ -11,11 +11,11 @@ RSpec.shared_examples "valid response" do
     expect(last_response).to be_ok
     expect(last_response.content_type).to eq("application/json")
     response = parse_json(last_response.body)
-    expect(response).to be_an_instance_of(Hash)
+    expect(response).to be_a(Hash)
     expect(response[:total]).not_to be_nil
     expect(response[:start]).not_to be_nil
     expect(response[:end]).not_to be_nil
-    expect(response[:data]).to be_an_instance_of(Array)
+    expect(response[:data]).to be_a(Array)
   end
 end
 
@@ -50,59 +50,60 @@ RSpec.shared_examples "nonempty rights response" do
 end
 
 def validate_access_profiles_row(row)
-  expect(row[:id]).to be_an_instance_of(Integer)
-  expect(row[:name]).to be_an_instance_of(String)
-  expect(row[:description]).to be_an_instance_of(String)
+  expect(row[:id]).to be_a(Integer)
+  expect(row[:name]).to be_a(String)
+  expect(row[:description]).to be_a(String)
 end
 
 def validate_access_statements_row(row)
-  expect(row[:statement_key]).to be_an_instance_of(String)
-  expect(row[:statement_url]).to be_an_instance_of(String)
-  expect(row[:statement_head]).to be_an_instance_of(String)
-  expect(row[:statement_text]).to be_an_instance_of(String)
-  expect(row[:statement_url_aux]).to be_an_instance_of(String).or(be_nil)
-  expect(row[:statement_icon_icon_aux]).to be_an_instance_of(String).or(be_nil)
-  expect(row[:statement_icon_aux]).to be_an_instance_of(String).or(be_nil)
+  expect(row[:statement_key]).to be_a(String)
+  expect(row[:statement_url]).to be_a(String)
+  expect(row[:statement_head]).to be_a(String)
+  expect(row[:statement_text]).to be_a(String)
+  expect(row[:statement_url_aux]).to be_a(String).or(be_nil)
+  expect(row[:statement_icon_icon_aux]).to be_a(String).or(be_nil)
+  expect(row[:statement_icon_aux]).to be_a(String).or(be_nil)
 end
 
 def validate_access_statements_map_row(row)
-  expect(row[:attribute]).to be_an_instance_of(String)
-  expect(row[:access_profile]).to be_an_instance_of(String)
-  expect(row[:statement_key]).to be_an_instance_of(String)
+  expect(row[:attribute]).to be_a(String)
+  expect(row[:access_profile]).to be_a(String)
+  expect(row[:statement_key]).to be_a(String)
 end
 
 # Validate a row from ht_rights.attributes
 # and eventually the structure by ht_rights.rights_current.attribute (see DEV-1008)
 def validate_attributes_row(row)
-  expect(row[:id]).to be_an_instance_of(Integer)
-  expect(row[:name]).to be_an_instance_of(String)
-  expect(row[:type]).to be_an_instance_of(String)
-  expect(row[:description]).to be_an_instance_of(String)
+  expect(row[:id]).to be_a(Integer)
+  expect(row[:name]).to be_a(String)
+  expect(row[:type]).to be_a(String)
+  expect(row[:description]).to be_a(String)
 end
 
 # Validate a row from ht_rights.reasons
 # and eventually the structure by ht_rights.rights_current.reason (see DEV-1008)
 def validate_reasons_row(row)
-  expect(row[:id]).to be_an_instance_of(Integer)
-  expect(row[:name]).to be_an_instance_of(String)
-  expect(row[:description]).to be_an_instance_of(String)
+  expect(row[:id]).to be_a(Integer)
+  expect(row[:name]).to be_a(String)
+  expect(row[:description]).to be_a(String)
 end
 
 # Validate a row from ht_rights.rights_current or ht_rights.rights_log
 def validate_rights_row(row)
-  expect(row[:namespace]).to be_an_instance_of(String)
-  expect(row[:id]).to be_an_instance_of(String)
-  expect(row[:attribute]).to be_an_instance_of(Integer)
-  expect(row[:reason]).to be_an_instance_of(Integer)
-  expect(row[:source]).to be_an_instance_of(Integer)
-  expect(row[:access_profile]).to be_an_instance_of(Integer)
-  expect(row[:time]).to be_an_instance_of(String)
+  expect(row[:namespace]).to be_a(String)
+  expect(row[:id]).to be_a(String)
+  expect(row[:htid]).to be_a(String)
+  validate_attributes_row row[:attribute]
+  validate_reasons_row row[:reason]
+  validate_sources_row row[:source]
+  validate_access_profiles_row row[:access_profile]
+  expect(row[:time]).to be_a(String)
 end
 
 def validate_sources_row(row)
-  expect(row[:id]).to be_an_instance_of(Integer)
-  expect(row[:name]).to be_an_instance_of(String)
-  expect(row[:description]).to be_an_instance_of(String)
-  expect(row[:access_profile]).to be_an_instance_of(Integer).or(be_nil)
-  expect(row[:digitization_source]).to be_an_instance_of(String).or(be_nil)
+  expect(row[:id]).to be_a(Integer)
+  expect(row[:name]).to be_a(String)
+  expect(row[:description]).to be_a(String)
+  expect(row[:digitization_source]).to be_a(String).or(be_nil)
+  validate_access_profiles_row row[:access_profile]
 end

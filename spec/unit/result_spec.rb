@@ -47,7 +47,7 @@ module RightsAPI
 
     describe "#to_h" do
       it "returns a hash" do
-        expect(result.to_h).to be_an_instance_of(Hash)
+        expect(result.to_h).to be_a(Hash)
       end
 
       it "returns a hash with the expected keys" do

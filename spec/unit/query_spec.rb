@@ -8,7 +8,7 @@ module RightsAPI
 
     describe ".new" do
       it "creates a Query" do
-        expect(query).to be_an_instance_of(described_class)
+        expect(query).to be_a(described_class)
       end
     end
 

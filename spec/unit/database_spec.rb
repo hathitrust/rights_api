@@ -5,7 +5,7 @@ require "climate_control"
 RSpec.describe RightsAPI::Database do
   describe "#initialize" do
     it "creates RightsAPI::Database instance" do
-      expect(described_class.new).to be_an_instance_of(RightsAPI::Database)
+      expect(described_class.new).to be_a(RightsAPI::Database)
     end
   end
 

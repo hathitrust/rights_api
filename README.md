@@ -94,7 +94,8 @@ Here's a truncated result from `http://localhost:4567/v1/access_profiles`:
 
 ```
 ## Testing
-The test suite is divided into unit and integration tests which can be run separately to give some orthogonality in checking for coverage gaps.
+The test suite is divided into unit and integration tests which can be run separately to
+give some orthogonality in checking for coverage gaps.
 ```
 # Full test suite
 docker-compose run --rm test
@@ -106,11 +107,16 @@ docker-compose run --rm test bundle exec rspec spec/unit
 docker-compose run --rm test bundle exec rspec spec/integration
 ```
 
+## Debugging
+To run an IRB session with `LOAD_PATH` set up:
+```
+docker compose run --rm test bundle exec bin/irb_session.rb
+```
+
 ## TODO
 
 See DEV-990
 
-- Remove last vestiges of `rights_database` gem
 - `/rights?...` query parameters other than HTID (dates, for example)
 - `/rights_log?...` query parameters other than HTID (dates, for example)
 - Results paging
