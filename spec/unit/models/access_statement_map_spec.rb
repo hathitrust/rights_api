@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "sequel"
+require "sequel/sql"
 
 module RightsAPI
   RSpec.describe(AccessStatementMap) do
