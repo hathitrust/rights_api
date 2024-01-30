@@ -4,8 +4,6 @@ require "sequel/sql"
 
 module RightsAPI
   RSpec.describe(Source) do
-    let(:hash_keys) { %i[id name description access_profile digitization_source].sort.freeze }
-
     describe "#base_dataset" do
       it "returns self" do
         expect(described_class.base_dataset).to be_a(Sequel::Mysql2::Dataset)
@@ -26,6 +24,7 @@ module RightsAPI
 
     describe "#to_h" do
       it "returns expected keys" do
+        hash_keys = %i[id name description access_profile digitization_source].sort
         expect(described_class.first.to_h.keys.sort).to eq(hash_keys)
       end
     end

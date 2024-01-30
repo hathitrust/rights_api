@@ -4,8 +4,6 @@ require "sequel/sql"
 
 module RightsAPI
   RSpec.describe(AccessStatementMap) do
-    let(:hash_keys) { %i[attribute access_profile statement_key].sort.freeze }
-
     describe "#base_dataset" do
       it "returns self" do
         expect(described_class.base_dataset).to eq(described_class)
@@ -40,6 +38,7 @@ module RightsAPI
 
     describe "#to_h" do
       it "returns expected structure" do
+        hash_keys = %i[attribute access_profile statement_key].sort
         expect(described_class.first.to_h.keys.sort).to eq(hash_keys)
       end
     end

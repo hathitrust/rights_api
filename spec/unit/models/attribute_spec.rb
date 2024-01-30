@@ -4,8 +4,6 @@ require "sequel/sql"
 
 module RightsAPI
   RSpec.describe(Attribute) do
-    let(:hash_keys) { %i[id type name description].sort.freeze }
-
     describe "#base_dataset" do
       it "returns self" do
         expect(described_class.base_dataset).to eq(described_class)
@@ -26,6 +24,7 @@ module RightsAPI
 
     describe "#to_h" do
       it "returns expected structure" do
+        hash_keys = %i[id type name description].sort
         expect(described_class.first.to_h.keys.sort).to eq(hash_keys)
       end
     end

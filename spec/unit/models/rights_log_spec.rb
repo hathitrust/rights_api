@@ -4,19 +4,6 @@ require "sequel/sql"
 
 module RightsAPI
   RSpec.describe(RightsLog) do
-    let(:hash_keys) {
-      %i[
-        namespace
-        id
-        htid
-        attribute
-        reason
-        source
-        access_profile
-        time
-      ].sort.freeze
-    }
-
     describe "#base_dataset" do
       it "returns a Sequel dataset" do
         expect(described_class.base_dataset).to be_a(Sequel::Mysql2::Dataset)
@@ -51,6 +38,17 @@ module RightsAPI
 
     describe "#to_h" do
       it "returns expected keys" do
+        hash_keys =
+          %i[
+            namespace
+            id
+            htid
+            attribute
+            reason
+            source
+            access_profile
+            time
+          ].sort
         expect(described_class.first.to_h.keys.sort).to eq(hash_keys)
       end
     end
