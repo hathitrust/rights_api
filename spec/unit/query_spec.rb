@@ -4,7 +4,8 @@ require "sequel"
 
 module RightsAPI
   RSpec.describe(Query) do
-    let(:query) { described_class.new(table_name: "rights") }
+    let(:query) { described_class.new(model: Attribute) }
+    let(:query_with_params) { described_class.new(model: Attribute, params: {id: [1]}) }
 
     describe ".new" do
       it "creates a Query" do
@@ -15,13 +16,13 @@ module RightsAPI
     describe "#run" do
       context "with an id" do
         it "returns a Result" do
-          expect(query.run(id: "some id")).to be_a_kind_of(Result)
+          expect(query_with_params.run).to be_a_kind_of(Result)
         end
       end
 
       context "without an id" do
         it "returns a Result" do
-          expect(query.run(id: nil)).to be_a_kind_of(Result)
+          expect(query.run).to be_a_kind_of(Result)
         end
       end
     end

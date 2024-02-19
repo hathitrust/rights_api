@@ -4,9 +4,9 @@
 ```bash
 git clone https://github.com/hathitrust/rights_api
 cd rights_api
-docker-compose build
-docker-compose run --rm web bundle install
-docker-compose up -d
+docker compose build
+docker compose run --rm web bundle install
+docker compose up -d
 ```
 
 ## Naming Conventions
@@ -59,7 +59,7 @@ See `lib/rights_api/app.rb` for all of the Sinatra routes.
 
 ## Results
 
-All API results, even 404s (which should only occur with a bad Sinatra route) should return
+All API results, even `404`s (which should only occur with a bad Sinatra route) should return
 the same general JSON structure. Here's the empty variant:
 
 ```JSON
@@ -93,6 +93,11 @@ Here's a truncated result from `http://localhost:4567/v1/access_profiles`:
 }
 
 ```
+
+`400` error results from bogus parameters (e.g., `&limit=blah`) will have an additional
+`error` Field in the return structure. This is human-readable and may include a backtrace,
+we're not sure yet.
+
 ## Testing
 The test suite is divided into unit and integration tests which can be run separately to
 give some orthogonality in checking for coverage gaps.

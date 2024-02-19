@@ -33,6 +33,7 @@ valid_identifier_for_table = {
 RSpec.describe "RightsAPI" do
   include Rack::Test::Methods
 
+  # Full search
   SUPPORT_TABLES.each do |table|
     describe "/#{table}" do
       before(:each) { get(rights_api_endpoint + table) }
@@ -40,6 +41,47 @@ RSpec.describe "RightsAPI" do
     end
   end
 
+  # With OFFSET
+  SUPPORT_TABLES.each do |table|
+    describe "/#{table}/offset=" do
+      context "with a valid offset value" do
+        before(:each) { get(rights_api_endpoint + table + "?offset=1") }
+        it_behaves_like "nonempty #{table} response"
+
+        it "returns data set starting at index 2" do
+          response = parse_json(last_response.body)
+          expect(response[:start]).to eq(2)
+        end
+      end
+
+      context "with a bogus offset value" do
+        before(:each) { get(rights_api_endpoint + table + "?offset=x") }
+        it_behaves_like "400 response"
+      end
+    end
+  end
+
+  # With LIMIT
+  SUPPORT_TABLES.each do |table|
+    describe "/#{table}?limit=" do
+      context "with a valid limit value" do
+        before(:each) { get(rights_api_endpoint + table + "?limit=2") }
+        it_behaves_like "nonempty #{table} response"
+
+        it "returns LIMIT rows" do
+          response = parse_json(last_response.body)
+          expect(response[:data].count).to eq(2)
+        end
+      end
+
+      context "with a bogus limit value" do
+        before(:each) { get(rights_api_endpoint + table + "?limit=x") }
+        it_behaves_like "400 response"
+      end
+    end
+  end
+
+  # By-id search
   SUPPORT_TABLES.each do |table|
     describe "/#{table}/:id" do
       context "with a valid identifier" do

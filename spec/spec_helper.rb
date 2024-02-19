@@ -2,6 +2,7 @@
 
 require "simplecov"
 require "simplecov-lcov"
+require "logger"
 
 SimpleCov.add_filter "spec"
 
@@ -14,6 +15,9 @@ SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
   SimpleCov::Formatter::LcovFormatter
 ])
 SimpleCov.start
+
+# The web service logging is more verbose than what we really want to deal with here...
+ENV["RIGHTS_API_LOGGER_LEVEL"] = Logger::WARN.to_s
 
 require_relative "../lib/rights_api"
 
