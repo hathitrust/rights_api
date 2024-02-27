@@ -4,9 +4,14 @@ require "sequel"
 
 require_relative "error"
 
+# Processes the Hash of URL parameters passed to the API into an
+# Array of WHERE constraints, as well as LIMIT, and OFFSET values.
+# ORDER BY (other than the schema default) will be handled here
+# in a future iteration.
 module RightsAPI
   class QueryParser
     DEFAULT_LIMIT = 1000
+    DEFAULT_OFFSET = 0
     attr_reader :params, :model, :where, :order, :offset, :limit
 
     # @param model [Class] Schema subclass for the table being queried
@@ -15,7 +20,7 @@ module RightsAPI
       @where = []
       @order = []
       @limit = DEFAULT_LIMIT
-      @offset = 0
+      @offset = DEFAULT_OFFSET
     end
 
     def parse(params: {})
@@ -28,9 +33,7 @@ module RightsAPI
         when :limit
           parse_limit(values: values)
         else
-          values.each do |value|
-            @where << parse_parameter(key: key, value: value)
-          end
+          parse_parameter(key: key, values: values)
         end
       end
       @order = [model.default_order] if @order.empty?
@@ -39,16 +42,26 @@ module RightsAPI
 
     private
 
-    def parse_parameter(key:, value:)
-      {model.query_for_field(field: key.to_sym) => value}
+    # Parses a general search parameter and appends the resulting Sequel
+    # expression to the @where array.
+    # Currently only handles primary key searches.
+    # Example: a URL ending with ?id=1 results in:
+    # parse_parameter(key: :id, values: [1])
+    # @param key [Symbol] The search parameter
+    # @param values [Array] One or more parameter values
+    def parse_parameter(key:, values:)
+      values.each do |value|
+        @where << {model.query_for_field(field: key.to_sym) => value}
+      end
     end
 
-    # Raturn single integer that can be passed to #offset.
+    # Extract a single integer that can be passed to dataset.offset.
     def parse_offset(values:)
       @offset = parse_int_value(values: values, type: "OFFSET")
     end
 
-    # Raturn single integer that can be passed to #limit.
+    # Extract a single integer that can be passed to dataset.limit.
+    # @param values [Array] One or more limit values
     def parse_limit(values:)
       @limit = parse_int_value(values: values, type: "LIMIT")
     end
@@ -56,7 +69,7 @@ module RightsAPI
     # Extract integer offset= or limit= value from potentially multiple values.
     # If multiple values, use the last.
     # @param values [Array] One or more offset or limit values
-    # @param type [Symbol] :offset or :limit, used only for reporting errors.
+    # @param type [String] "OFFSET" or "LIMIT", used only for reporting errors.
     # @return [Integer]
     def parse_int_value(values:, type:)
       value = values.last.to_i

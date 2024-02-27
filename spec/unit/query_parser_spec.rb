@@ -39,6 +39,10 @@ module RightsAPI
       it "raises on bogus LIMIT queries" do
         expect { query_parser.parse(params: {limit: ["a"]}) }.to raise_error(QueryParserError)
       end
+
+      it "raises on bogus OFFSET queries" do
+        expect { query_parser.parse(params: {offset: ["a"]}) }.to raise_error(QueryParserError)
+      end
     end
   end
 end
