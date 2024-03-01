@@ -11,10 +11,11 @@ module RightsAPI
   class Query
     attr_reader :model, :params
 
-    # @param model [String, Symbol] The name of the table to be queried.
+    # @param model [Class] Sequel::Model subclass for the table being queried
+    # @param params [Hash] CGI parameters submitted to the Sinatra frontend
     def initialize(model:, params: {})
-      @params = params.is_a?(String) ? CGI.parse(params) : params
       @model = model
+      @params = params
     end
 
     # @return [Result]

@@ -14,7 +14,7 @@ module RightsAPI
     DEFAULT_OFFSET = 0
     attr_reader :params, :model, :where, :order, :offset, :limit
 
-    # @param model [Class] Schema subclass for the table being queried
+    # @param model [Class] Sequel::Model subclass for the table being queried
     def initialize(model:)
       @model = model
       @where = []
