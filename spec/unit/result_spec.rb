@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RightsAPI
-  REQUIRED_HASH_KEYS = %w[total start end data]
+  REQUIRED_HASH_KEYS = %w[total start end milliseconds data]
   RSpec.describe(Result) do
     let(:result) { described_class.new }
     let(:test_row) { {key1: "value1", key2: "value2"} }
@@ -17,14 +17,16 @@ module RightsAPI
           expect(result.start).to eq(0)
           expect(result.end).to eq(0)
           expect(result.data).to eq([])
+          expect(result.milliseconds).to eq(0.0)
         end
       end
 
       context "with parameters" do
         it "uses provided offset and total" do
-          res = described_class.new(offset: 10, total: 100)
+          res = described_class.new(offset: 10, total: 100, milliseconds: 100.0)
           expect(res.offset).to eq(10)
           expect(res.total).to eq(100)
+          expect(res.total).to eq(100.0)
         end
       end
     end

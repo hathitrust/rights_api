@@ -20,16 +20,20 @@ module RightsAPI
 
     # @return [Result]
     def run
+      start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       dataset = model.base_dataset
       # This may raise QueryParserError
       @parser = QueryParser.new(model: @model).parse(params: @params)
       @parser.where.each do |where|
         dataset = dataset.where(where)
       end
-      result = Result.new(offset: @parser.offset, total: dataset.count)
+      # Save this here because offset and limit may alter the count.
+      total = dataset.count
       dataset = dataset.order(*@parser.order)
         .offset(@parser.offset)
         .limit(@parser.limit).all
+      time_delta = 1000 * (Process.clock_gettime(Process::CLOCK_MONOTONIC) - start_time)
+      result = Result.new(offset: @parser.offset, total: total, milliseconds: time_delta)
       dataset.each do |row|
         result.add! row: row.to_h
       end
