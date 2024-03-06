@@ -17,8 +17,8 @@ module RightsAPI
     def initialize(model:, params: {})
       @model = model
       @params = params
+      @parser = QueryParser.new(model: model)
       @total = 0
-      @parser = QueryParser.new(model: @model)
       @dataset = nil
     end
 
