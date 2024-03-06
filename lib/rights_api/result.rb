@@ -5,13 +5,14 @@
 # and then data is populated according to the requested offset and limit.
 module RightsAPI
   class Result
-    attr_reader :offset, :total, :start, :end, :data
+    attr_reader :offset, :total, :start, :end, :milliseconds, :data
 
     # @param offset [Integer] The offset=x URL parameter.
     # @param total [Integer] The total number of results, regardless of paging.
-    def initialize(offset: 0, total: 0)
+    def initialize(offset: 0, total: 0, milliseconds: 0.0)
       @offset = offset
       @total = total
+      @milliseconds = milliseconds
       @start = 0
       @end = 0
       @data = []
@@ -37,6 +38,7 @@ module RightsAPI
         "total" => @total,
         "start" => @start,
         "end" => @end,
+        "milliseconds" => @milliseconds,
         "data" => @data
       }
       finalize h

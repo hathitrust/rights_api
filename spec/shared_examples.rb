@@ -1,5 +1,11 @@
 # frozen_string_literal: true
 
+RSpec.shared_examples "400 response" do
+  it "returns an HTTP 400 response" do
+    expect(last_response.status).to eq 400
+  end
+end
+
 RSpec.shared_examples "404 response" do
   it "returns an HTTP 404 response" do
     expect(last_response.status).to eq 404

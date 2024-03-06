@@ -1,30 +1,44 @@
 # frozen_string_literal: true
 
+require "benchmark"
+require "cgi"
+
+require_relative "error"
+require_relative "query_parser"
 require_relative "result"
 require_relative "services"
 
 module RightsAPI
   class Query
-    DEFAULT_LIMIT = 1000
-    attr_reader :table_name
+    attr_reader :model, :params, :parser, :total, :dataset
 
-    # @param name [String, Symbol] The name of the table to be queried.
-    def initialize(table_name:)
-      @table_name = table_name
+    # @param model [Class] Sequel::Model subclass for the table being queried
+    # @param params [Hash] CGI parameters submitted to the Sinatra frontend
+    def initialize(model:, params: {})
+      @model = model
+      @params = params
+      @parser = QueryParser.new(model: model)
+      @total = 0
+      @dataset = nil
     end
 
-    # @param id [String] The primary value to retrieve, or nil for all rows.
     # @return [Result]
-    def run(id: nil)
-      model = Schema.model_for name: table_name
-      dataset = model.base_dataset
-      if id
-        where = {model.query_for_field(field: model.default_key) => id}
-        dataset = dataset.where(where)
+    def run
+      # This may raise QueryParserError
+      parser.parse(params: params)
+      time_delta = Benchmark.realtime do
+        @dataset = model.base_dataset
+        parser.where.each do |where|
+          @dataset = dataset.where(where)
+        end
+        # Save this here because offset and limit may alter the count.
+        @total = dataset.count
+        @dataset = dataset.order(*parser.order)
+          .offset(parser.offset)
+          .limit(parser.limit)
+          .all
       end
-      dataset = dataset.order(model.default_order)
-        .limit(DEFAULT_LIMIT).all
-      result = Result.new(total: dataset.count)
+      result = Result.new(offset: parser.offset, total: total, milliseconds: 1000 * time_delta)
       dataset.each do |row|
         result.add! row: row.to_h
       end

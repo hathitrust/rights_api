@@ -1,8 +1,16 @@
 ---
 version: '3'
 
-services:
+x-condition-healthy: &healthy
+  condition: service_healthy
 
+x-healthcheck-defaults: &healthcheck-defaults
+  interval: 5s
+  timeout: 10s
+  start_period: 10s
+  retries: 5
+
+services:
   web:
     build: .
     ports:
@@ -15,18 +23,7 @@ services:
       RIGHTS_API_DATABASE_CONNECTION_STRING: "mysql2://ht_rights:ht_rights@mariadb/ht"
       RIGHTS_API_LOGGER_LEVEL: 1 # Logger::INFO
     depends_on:
-      - mariadb
-
-  test:
-    build: .
-    volumes:
-      - .:/usr/src/app
-      - gem_cache:/gems
-    command: bash -c "/usr/local/bin/wait-for mariadb:3306 && bundle exec rspec"
-    environment:
-      RIGHTS_API_DATABASE_CONNECTION_STRING: "mysql2://ht_rights:ht_rights@mariadb/ht"
-    depends_on:
-      - mariadb
+      mariadb: *healthy
 
   mariadb:
     image: ghcr.io/hathitrust/db-image
@@ -38,6 +35,9 @@ services:
       MYSQL_DATABASE: ht
       MYSQL_USER: ht_rights
       MYSQL_PASSWORD: ht_rights
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: [ "CMD", "healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized" ]
 
 volumes:
   gem_cache:
