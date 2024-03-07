@@ -3,7 +3,6 @@
 module RightsAPI
   class AccessProfile < Sequel::Model
     extend ModelExtensions
-    one_to_many :source, model: :"RightsAPI::Source", key: :access_profile
 
     def to_h
       {
