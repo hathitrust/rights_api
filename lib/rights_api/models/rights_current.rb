@@ -10,6 +10,7 @@ module RightsAPI
     many_to_one :attribute_obj, class: :"RightsAPI::Attribute", key: :attr
     many_to_one :reason_obj, class: :"RightsAPI::Reason", key: :reason
     many_to_one :source_obj, class: :"RightsAPI::Source", key: :source
+    set_primary_key [:namespace, :id]
 
     # Maybe TOO eager. This makes us partially responsible for the fact that rights_current.source
     # has an embedded access_profile.

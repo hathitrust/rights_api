@@ -3,6 +3,7 @@
 module RightsAPI
   class AccessStatement < Sequel::Model(:access_stmts)
     extend ModelExtensions
+    set_primary_key :stmt_key
 
     def self.default_key
       :stmt_key

@@ -3,6 +3,7 @@
 module RightsAPI
   class Reason < Sequel::Model
     extend ModelExtensions
+    set_primary_key :id
 
     def to_h
       {
