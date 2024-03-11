@@ -3,6 +3,7 @@
 module RightsAPI
   class AccessStatementMap < Sequel::Model(:access_stmts_map)
     extend ModelExtensions
+    set_primary_key [:a_attr, :a_access_profile]
 
     def self.default_key
       :attr_access_id
