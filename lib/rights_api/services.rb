@@ -3,10 +3,16 @@
 require "canister"
 require "logger"
 
+require_relative "cache"
 require_relative "database"
 
 module RightsAPI
   Services = Canister.new
+
+  Services.register(:cache) do
+    Cache.new
+  end
+
   Services.register(:database) do
     Database.new
   end

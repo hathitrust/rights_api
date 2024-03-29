@@ -36,7 +36,9 @@ module RightsAPI
           parse_parameter(key: key, values: values)
         end
       end
-      @order = [model.default_order] if @order.empty?
+      # Always tack on the default order even if it is redundant.
+      # The offset optimizer requires that there be an intrinsic order.
+      @order += model.default_order
       self
     end
 

@@ -19,9 +19,14 @@ module RightsAPI
     end
 
     # For use in ORDER BY clause.
-    # @return [Sequel::SQL::QualifiedIdentifier]
+    # @return [Array<Sequel::SQL::QualifiedIdentifier>]
     def default_order
-      query_for_field field: default_key
+      [query_for_field(field: default_key)]
+    end
+
+    # Use the offset optimizer to minimize use of OFFSET?
+    def optimize?
+      false
     end
 
     # @param field [String, Symbol]

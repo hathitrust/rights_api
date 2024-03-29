@@ -1,11 +1,8 @@
 # frozen_string_literal: true
 
-require "sequel"
-
 module RightsAPI
   RSpec.describe(QueryParser) do
     let(:query_parser) { described_class.new(model: Attribute) }
-    # let(:id_query) { described_class.new(params: "id=some+id", table_name: "rights") }
 
     describe ".new" do
       it "creates a #{described_class}" do

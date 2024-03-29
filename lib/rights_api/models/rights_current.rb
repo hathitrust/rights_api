@@ -30,10 +30,25 @@ module RightsAPI
       super field: field
     end
 
-    # rights_current and rights_log should order by timestamp
-    # @return [Sequel::SQL::Expression]
+    # rights_current and rights_log should order by htid, timestamp
+    # @return [Array<Sequel::SQL::QualifiedIdentifier>]
     def self.default_order
-      qualify field: :time
+      [
+        qualify(field: :namespace),
+        qualify(field: :id),
+        qualify(field: :time)
+      ]
+    end
+
+    def self.optimize?
+      true
+    end
+
+    # @return [Array<Sequel::SQL::Expression>]
+    def self.optimizer_query(value:)
+      lhs = Sequel[default_order]
+      rhs = Sequel[[value[:namespace], value[:id], value[:time]]]
+      [lhs > rhs]
     end
 
     def to_h
