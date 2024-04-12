@@ -9,10 +9,11 @@ module RightsAPI
 
     # @param offset [Integer] The offset=x URL parameter.
     # @param total [Integer] The total number of results, regardless of paging.
-    def initialize(offset: 0, total: 0, milliseconds: 0.0)
+    def initialize(offset: 0, total: 0, milliseconds: 0.0, cached: false)
       @offset = offset
       @total = total
       @milliseconds = milliseconds
+      @cached = cached
       @start = 0
       @end = 0
       @data = []
@@ -39,6 +40,7 @@ module RightsAPI
         "start" => @start,
         "end" => @end,
         "milliseconds" => @milliseconds,
+        "cached" => @cached,
         "data" => @data
       }
       finalize h

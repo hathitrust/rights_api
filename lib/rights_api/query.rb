@@ -23,6 +23,7 @@ module RightsAPI
     # @return [Result]
     def run
       dataset = nil
+      cached = false
       # This may raise QueryParserError
       parser.parse(params: params)
       optimizer = QueryOptimizer.new(parser: parser)
@@ -36,11 +37,13 @@ module RightsAPI
         @total = dataset.count
         optimizer.where.each do |where|
           dataset = dataset.where(where)
+          cached = true
         end
         dataset = dataset.offset(optimizer.offset) if optimizer.offset.positive?
         dataset = dataset.limit(parser.limit).all
       end
-      result = Result.new(offset: parser.offset, total: total, milliseconds: 1000 * time_delta)
+      result = Result.new(offset: parser.offset, total: total, milliseconds: 1000 * time_delta,
+        cached: cached)
       dataset.each do |row|
         result.add! row: row.to_h
       end
