@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "cgi"
 require "sinatra"
 require "sinatra/json"
 require "sinatra/reloader" if development?
