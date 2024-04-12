@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RightsAPI
-  REQUIRED_HASH_KEYS = %w[total start end milliseconds data]
+  REQUIRED_HASH_KEYS = %w[total start end milliseconds cached data]
   RSpec.describe(Result) do
     let(:result) { described_class.new }
     let(:test_row) { {key1: "value1", key2: "value2"} }
