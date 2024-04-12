@@ -38,7 +38,7 @@ module RightsAPI
         limit: parser.limit,
         last: dataset.last.to_h
       }
-      Services[:cache].add(key: model_params_md5, data: data)
+      Services[:cache][model_params_md5] = data
     end
 
     private

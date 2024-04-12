@@ -9,6 +9,7 @@ gem "puma"
 gem "sequel"
 gem "sinatra"
 gem "sinatra-contrib"
+gem "lru_redux"
 
 group :development, :test do
   gem "ffi-icu"

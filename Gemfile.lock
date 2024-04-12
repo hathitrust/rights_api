@@ -16,6 +16,7 @@ GEM
     json-canonicalization (1.0.0)
     language_server-protocol (3.17.0.3)
     lint_roller (1.1.0)
+    lru_redux (1.1.0)
     method_source (1.0.0)
     multi_json (1.15.0)
     mustermann (3.0.0)
@@ -117,6 +118,7 @@ DEPENDENCIES
   ffi-icu
   json
   json-canonicalization
+  lru_redux
   mysql2
   pry
   puma
