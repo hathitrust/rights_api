@@ -4,7 +4,6 @@ require "climate_control"
 require "ffi-icu"
 require "rack/test"
 require "shared_examples"
-require "pry"
 
 RSpec.describe "/rights_log" do
   include Rack::Test::Methods
