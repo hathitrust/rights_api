@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require "ffi-icu"
+# require "ffi-icu"
 require "rack/test"
 require "shared_examples"
 
 RSpec.describe "/rights" do
   include Rack::Test::Methods
   # Use ICU collator to try to approximate Sequel's collation of underscore vs Ruby's
-  let(:collator) { ICU::Collation::Collator.new("en") }
+  # let(:collator) { ICU::Collation::Collator.new("en") }
 
   describe "/rights_log/HTID" do
     context "with a valid HTID" do
@@ -33,19 +33,6 @@ RSpec.describe "/rights" do
           a[:time] <=> b[:time]
       end
       expect(response[:data]).to eq(sorted)
-    end
-  end
-
-  context "with an OFFSET" do
-    before(:each) { get(rights_api_endpoint + "rights?limit=2") }
-
-    it "produces the same results with or without optimizer" do
-      optimized = parse_json get(rights_api_endpoint + "rights?limit=2&offset=2").body
-      unoptimized = nil
-      ClimateControl.modify(RIGHTS_API_DISABLE_OFFSET_OPTIMIZER: "1") do
-        unoptimized = parse_json get(rights_api_endpoint + "rights?limit=2&offset=2").body
-      end
-      expect(optimized[:data]).to eq(unoptimized[:data])
     end
   end
 end

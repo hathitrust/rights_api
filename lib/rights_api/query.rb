@@ -2,8 +2,8 @@
 
 require "benchmark"
 
+require_relative "cursor"
 require_relative "error"
-require_relative "query_optimizer"
 require_relative "query_parser"
 require_relative "result"
 
@@ -23,32 +23,37 @@ module RightsAPI
     # @return [Result]
     def run
       dataset = nil
-      cached = false
       # This may raise QueryParserError
       parser.parse(params: params)
-      optimizer = QueryOptimizer.new(parser: parser)
       time_delta = Benchmark.realtime do
         dataset = model.base_dataset
         parser.where.each do |where|
           dataset = dataset.where(where)
         end
-        dataset = dataset.order(*parser.order)
-        # Save this here because offset and limit may alter the count.
+        dataset = dataset.order(*(parser.order.map { |order| order_to_sequel(order: order, model: model) }))
+        # Save this here because limit may alter the count.
         @total = dataset.count
-        optimizer.where.each do |where|
-          dataset = dataset.where(where)
-          cached = true
-        end
-        dataset = dataset.offset(optimizer.offset) if optimizer.offset.positive?
         dataset = dataset.limit(parser.limit).all
       end
-      result = Result.new(offset: parser.offset, total: total, milliseconds: 1000 * time_delta,
-        cached: cached)
+      result = Result.new(offset: parser.offset, total: total, milliseconds: 1000 * time_delta)
       dataset.each do |row|
         result.add! row: row.to_h
       end
-      optimizer.add_to_cache(dataset: dataset)
+      if result.more?
+        cursor = parser.cursor.encode(order: parser.order, rows: dataset)
+        result.cursor = cursor
+      end
       result
+    end
+
+    private
+
+    def order_to_sequel(order:, model:)
+      if order.asc?
+        Sequel.asc(model.qualify(field: order.column))
+      else
+        Sequel.desc(model.qualify(field: order.column))
+      end
     end
   end
 end

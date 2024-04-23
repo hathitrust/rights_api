@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "order"
+
 module RightsAPI
   module ModelExtensions
     # Overridden by classes that want to do some kind of #eager or #eager_graph
@@ -19,14 +21,9 @@ module RightsAPI
     end
 
     # For use in ORDER BY clause.
-    # @return [Array<Sequel::SQL::QualifiedIdentifier>]
+    # @return [Array<RightsAPI::Order>]
     def default_order
-      [query_for_field(field: default_key)]
-    end
-
-    # Use the offset optimizer to minimize use of OFFSET?
-    def optimize?
-      false
+      [Order.new(column: default_key)]
     end
 
     # @param field [String, Symbol]

@@ -10,7 +10,7 @@ module RightsAPI
       end
 
       it "has the expected attribute readers" do
-        %i[model where order offset limit].each do |reader|
+        %i[model where order limit cursor].each do |reader|
           expect(query_parser.send(reader)).not_to be_nil
         end
       end
@@ -25,8 +25,16 @@ module RightsAPI
         expect(query_parser.parse(params: {id: ["1"]}).where.count).to eq(1)
       end
 
-      it "parses OFFSET query" do
-        expect(query_parser.parse(params: {offset: ["1"]}).offset).to eq(1)
+      it "parses cursor" do
+        expect(query_parser.parse(params: {cursor: [VALID_CURSOR]}).cursor).to be_a(RightsAPI::Cursor)
+      end
+
+      it "raises on bogus cursor" do
+        expect { query_parser.parse(params: {cursor: [INVALID_CURSOR]}) }.to raise_error(QueryParserError)
+      end
+
+      it "raises on multiple cursors" do
+        expect { query_parser.parse(params: {cursor: [VALID_CURSOR, ANOTHER_VALID_CURSOR]}) }.to raise_error(QueryParserError)
       end
 
       it "parses LIMIT query" do
@@ -35,10 +43,6 @@ module RightsAPI
 
       it "raises on bogus LIMIT queries" do
         expect { query_parser.parse(params: {limit: ["a"]}) }.to raise_error(QueryParserError)
-      end
-
-      it "raises on bogus OFFSET queries" do
-        expect { query_parser.parse(params: {offset: ["a"]}) }.to raise_error(QueryParserError)
       end
     end
   end

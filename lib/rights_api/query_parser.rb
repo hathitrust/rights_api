@@ -2,7 +2,9 @@
 
 require "sequel"
 
+require_relative "cursor"
 require_relative "error"
+require_relative "order"
 
 # Processes the Hash of URL parameters passed to the API into an
 # Array of WHERE constraints, as well as LIMIT, and OFFSET values.
@@ -11,16 +13,15 @@ require_relative "error"
 module RightsAPI
   class QueryParser
     DEFAULT_LIMIT = 1000
-    DEFAULT_OFFSET = 0
-    attr_reader :params, :model, :where, :order, :offset, :limit
+    attr_reader :params, :model, :order, :limit
 
     # @param model [Class] Sequel::Model subclass for the table being queried
     def initialize(model:)
       @model = model
       @where = []
       @order = []
+      @cursor = nil
       @limit = DEFAULT_LIMIT
-      @offset = DEFAULT_OFFSET
     end
 
     def parse(params: {})
@@ -28,18 +29,32 @@ module RightsAPI
       params.each do |key, values|
         key = key.to_sym
         case key
-        when :offset
-          parse_offset(values: values)
+        when :cursor
+          parse_cursor(values: values)
         when :limit
           parse_limit(values: values)
+        when :order
+          parse_order(values: values)
         else
           parse_parameter(key: key, values: values)
         end
       end
       # Always tack on the default order even if it is redundant.
-      # The offset optimizer requires that there be an intrinsic order.
+      # The cursor implementation requires that there be an intrinsic order.
       @order += model.default_order
       self
+    end
+
+    def where
+      @where + cursor.where(model: model, order: order)
+    end
+
+    def offset
+      cursor.offset
+    end
+
+    def cursor
+      @cursor || Cursor.new
     end
 
     private
@@ -57,9 +72,25 @@ module RightsAPI
       end
     end
 
-    # Extract a single integer that can be passed to dataset.offset.
-    def parse_offset(values:)
-      @offset = parse_int_value(values: values, type: "OFFSET")
+    # Raturn Array that can be passed as params to .order
+    def parse_order(values:)
+      values.each do |value|
+        column, dir = value.split(/\s+/, 2)
+        @order << Order.new(column: column, asc: dir.nil? || dir.downcase == "asc")
+      end
+    end
+
+    # Parse cursor value into an auxiliary WHERE clause
+    def parse_cursor(values:)
+      # Services[:logger].info "parse_cursor #{values}"
+      if values.count > 1
+        raise QueryParserError, "multiple cursor values"
+      end
+      begin
+        @cursor = Cursor.new(cursor_string: values.first)
+      rescue ArgumentError => e
+        raise QueryParserError, "cannot decode cursor: #{e.message}"
+      end
     end
 
     # Extract a single integer that can be passed to dataset.limit.

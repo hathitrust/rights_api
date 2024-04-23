@@ -2,7 +2,6 @@
 
 require "canister"
 require "logger"
-require "lru_redux"
 
 require_relative "database"
 
@@ -10,10 +9,6 @@ DEFAULT_CACHE_SIZE = 1000
 
 module RightsAPI
   Services = Canister.new
-
-  Services.register(:cache) do
-    LruRedux::Cache.new(DEFAULT_CACHE_SIZE)
-  end
 
   Services.register(:database) do
     Database.new

@@ -5,15 +5,15 @@
 # and then data is populated according to the requested offset and limit.
 module RightsAPI
   class Result
-    attr_reader :offset, :total, :start, :end, :milliseconds, :data
+    attr_reader :offset, :total, :start, :end, :milliseconds, :cursor, :data
 
     # @param offset [Integer] The offset=x URL parameter.
     # @param total [Integer] The total number of results, regardless of paging.
-    def initialize(offset: 0, total: 0, milliseconds: 0.0, cached: false)
+    def initialize(offset: 0, total: 0, milliseconds: 0.0)
       @offset = offset
       @total = total
       @milliseconds = milliseconds
-      @cached = cached
+      @cursor = nil
       @start = 0
       @end = 0
       @data = []
@@ -33,6 +33,15 @@ module RightsAPI
       self
     end
 
+    # @return [Boolean] are there any more results after this one?
+    def more?
+      @end < @total
+    end
+
+    def cursor=(arg)
+      @cursor = arg unless arg.nil?
+    end
+
     # @return [Hash<String, Object>]
     def to_h
       h = {
@@ -40,9 +49,9 @@ module RightsAPI
         "start" => @start,
         "end" => @end,
         "milliseconds" => @milliseconds,
-        "cached" => @cached,
         "data" => @data
       }
+      h["cursor"] = @cursor unless @cursor.nil?
       finalize h
     end
 

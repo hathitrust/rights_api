@@ -17,8 +17,11 @@ module RightsAPI
     end
 
     describe "#default_order" do
-      it "returns Array with timestamp" do
-        expect(described_class.default_order.first).to be_a(Sequel::SQL::Expression)
+      it "returns Array of RightsAPI::Order" do
+        expect(described_class.default_order).to be_a(Array)
+        described_class.default_order.each do |order|
+          expect(order).to be_a(RightsAPI::Order)
+        end
       end
     end
 

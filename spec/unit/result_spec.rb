@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RightsAPI
-  REQUIRED_HASH_KEYS = %w[total start end milliseconds cached data]
+  REQUIRED_HASH_KEYS = %w[total start end milliseconds data]
   RSpec.describe(Result) do
     let(:result) { described_class.new }
     let(:test_row) { {key1: "value1", key2: "value2"} }
@@ -44,6 +44,32 @@ module RightsAPI
       it "updates start and end" do
         expect(result.add!(row: test_row).start).to eq(1)
         expect(result.add!(row: test_row).end).to eq(2)
+      end
+    end
+
+    describe "#more?" do
+      context "with a total greater than rows added" do
+        it "returns true" do
+          res = described_class.new(total: 4)
+          2.times { |i| res.add! row: {} }
+          expect(res.more?).to be true
+        end
+      end
+
+      context "with a total equal to rows added" do
+        it "returns false" do
+          res = described_class.new(total: 4)
+          4.times { |i| res.add! row: {} }
+          expect(res.more?).to be false
+        end
+      end
+    end
+
+    describe "#cursor=" do
+      it "sets the cursor" do
+        res = described_class.new(total: 1)
+        res.cursor = "cursor"
+        expect(res.cursor).to eq "cursor"
       end
     end
 

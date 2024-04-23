@@ -42,24 +42,24 @@ RSpec.describe "RightsAPI" do
   end
 
   # With OFFSET
-  SUPPORT_TABLES.each do |table|
-    describe "/#{table}/offset=" do
-      context "with a valid offset value" do
-        before(:each) { get(rights_api_endpoint + table + "?offset=1") }
-        it_behaves_like "nonempty #{table} response"
-
-        it "returns data set starting at index 2" do
-          response = parse_json(last_response.body)
-          expect(response[:start]).to eq(2)
-        end
-      end
-
-      context "with a bogus offset value" do
-        before(:each) { get(rights_api_endpoint + table + "?offset=x") }
-        it_behaves_like "400 response"
-      end
-    end
-  end
+  # SUPPORT_TABLES.each do |table|
+  #     describe "/#{table}/offset=" do
+  #       context "with a valid offset value" do
+  #         before(:each) { get(rights_api_endpoint + table + "?offset=1") }
+  #         it_behaves_like "nonempty #{table} response"
+  #
+  #         it "returns data set starting at index 2" do
+  #           response = parse_json(last_response.body)
+  #           expect(response[:start]).to eq(2)
+  #         end
+  #       end
+  #
+  #       context "with a bogus offset value" do
+  #         before(:each) { get(rights_api_endpoint + table + "?offset=x") }
+  #         it_behaves_like "400 response"
+  #       end
+  #     end
+  #   end
 
   # With LIMIT
   SUPPORT_TABLES.each do |table|
