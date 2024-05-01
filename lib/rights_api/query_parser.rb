@@ -33,8 +33,6 @@ module RightsAPI
           parse_cursor(values: values)
         when :limit
           parse_limit(values: values)
-        when :order
-          parse_order(values: values)
         else
           parse_parameter(key: key, values: values)
         end
@@ -72,14 +70,6 @@ module RightsAPI
       end
     end
 
-    # Raturn Array that can be passed as params to .order
-    def parse_order(values:)
-      values.each do |value|
-        column, dir = value.split(/\s+/, 2)
-        @order << Order.new(column: column, asc: dir.nil? || dir.downcase == "asc")
-      end
-    end
-
     # Parse cursor value into an auxiliary WHERE clause
     def parse_cursor(values:)
       # Services[:logger].info "parse_cursor #{values}"
@@ -105,6 +95,8 @@ module RightsAPI
     # @param type [String] "OFFSET" or "LIMIT", used only for reporting errors.
     # @return [Integer]
     def parse_int_value(values:, type:)
+      return values.last if values.last.is_a? Integer
+
       value = values.last.to_i
       # Make sure the offset can make a round-trip conversion between Int and String
       # https://stackoverflow.com/a/1235891

@@ -53,20 +53,17 @@ module RightsAPI
       order.each do |ord|
         data << row[ord.column]
       end
-      Services[:logger].info "to encode: #{data}"
       self.class.encode data
     end
 
     # Generate zero or one WHERE clauses that will generate a pseudo-OFFSET
     # based on ORDER BY parameters.
-    # FIXME: should cursor be a required parameter? (require "*" in order to get back a
-    # cursor value?)
-    # TODO: Can we shorten long cursors by calculating longest common initial substring
-    # based on last value in current window and first value of next?
     # ORDER BY a, b, c TRANSLATES TO
     # WHERE (a > 1)
     # OR (a = 1 AND b > 2)
     # OR (a = 1 AND b = 2 AND c > 3)
+    # @param model [Class] Sequel::Model subclass for the table being queried
+    # @param order [Array<RightsAPI::Order>]
     def where(model:, order:)
       return [] if values.empty?
 
@@ -79,8 +76,7 @@ module RightsAPI
       order.count.times do |order_index|
         # Take a slice of ORDER of size order_index + 1
         and_clause = order[0, order_index + 1].each_with_index.map do |ord, i|
-          # in which each element is a "col op val" string
-          # and the last is an inequality
+          # in which each element is a "col op val" string and the last is an inequality
           op = if i == order_index
             ord.asc? ? ">" : "<"
           else

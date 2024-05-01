@@ -17,5 +17,14 @@ module RightsAPI
     def asc?
       @asc
     end
+
+    # @return [Sequel::SQL::OrderedExpression]
+    def to_sequel(model:)
+      if asc?
+        Sequel.asc(model.qualify(field: column))
+      else
+        Sequel.desc(model.qualify(field: column))
+      end
+    end
   end
 end

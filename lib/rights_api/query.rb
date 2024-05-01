@@ -30,7 +30,7 @@ module RightsAPI
         parser.where.each do |where|
           dataset = dataset.where(where)
         end
-        dataset = dataset.order(*(parser.order.map { |order| order_to_sequel(order: order, model: model) }))
+        dataset = dataset.order(*(parser.order.map { |order| order.to_sequel(model: model) }))
         # Save this here because limit may alter the count.
         @total = dataset.count
         dataset = dataset.limit(parser.limit).all
@@ -44,16 +44,6 @@ module RightsAPI
         result.cursor = cursor
       end
       result
-    end
-
-    private
-
-    def order_to_sequel(order:, model:)
-      if order.asc?
-        Sequel.asc(model.qualify(field: order.column))
-      else
-        Sequel.desc(model.qualify(field: order.column))
-      end
     end
   end
 end

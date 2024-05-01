@@ -30,5 +30,21 @@ module RightsAPI
         end
       end
     end
+
+    describe "#to_sequel" do
+      context "with default direction" do
+        it "returns Sequel::SQL::OrderedExpression with #descending == false" do
+          expect(order.to_sequel(model: RightsCurrent)).to be_a(Sequel::SQL::OrderedExpression)
+          expect(order.to_sequel(model: RightsCurrent).descending).to eq(false)
+        end
+      end
+
+      context "with asc false" do
+        it "returns Sequel::SQL::OrderedExpression with #descending == true" do
+          expect(order_desc.to_sequel(model: RightsCurrent)).to be_a(Sequel::SQL::OrderedExpression)
+          expect(order_desc.to_sequel(model: RightsCurrent).descending).to eq(true)
+        end
+      end
+    end
   end
 end
