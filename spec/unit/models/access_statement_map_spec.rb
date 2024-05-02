@@ -17,8 +17,8 @@ module RightsAPI
     end
 
     describe "#default_order" do
-      it "returns SQL expression" do
-        expect(described_class.default_order).to be_a(Sequel::SQL::Expression)
+      it "returns Array" do
+        expect(described_class.default_order).to be_a(Array)
       end
     end
 
