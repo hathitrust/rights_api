@@ -11,9 +11,9 @@ gem "sinatra-contrib"
 
 group :development, :test do
   gem "pry"
-  gem "rack-test"
+  gem "standard"
   gem "rspec"
+  gem "rack-test"
   gem "simplecov"
   gem "simplecov-lcov"
-  gem "standard"
 end
