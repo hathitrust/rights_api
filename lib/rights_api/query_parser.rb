@@ -47,12 +47,8 @@ module RightsAPI
       @where + cursor.where(model: model, order: order)
     end
 
-    def offset
-      cursor.offset
-    end
-
     def cursor
-      @cursor || Cursor.new
+      @cursor ||= Cursor.new
     end
 
     private

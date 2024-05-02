@@ -35,7 +35,7 @@ module RightsAPI
         @total = dataset.count
         dataset = dataset.limit(parser.limit).all
       end
-      result = Result.new(offset: parser.offset, total: total, milliseconds: 1000 * time_delta)
+      result = Result.new(offset: parser.cursor.offset, total: total, milliseconds: 1000 * time_delta)
       dataset.each do |row|
         result.add! row: row.to_h
       end
