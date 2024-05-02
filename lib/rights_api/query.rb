@@ -31,8 +31,12 @@ module RightsAPI
           dataset = dataset.where(where)
         end
         dataset = dataset.order(*(parser.order.map { |order| order.to_sequel(model: model) }))
-        # Save this here because limit may alter the count.
+        # Save this here because limit and cursor would otherwise alter the count.
         @total = dataset.count
+        # Apply the cursor to get to the offset we want
+        parser.cursor.where(model: model, order: parser.order).each do |where|
+          dataset = dataset.where(where)
+        end
         dataset = dataset.limit(parser.limit).all
       end
       result = Result.new(offset: parser.cursor.offset, total: total, milliseconds: 1000 * time_delta)

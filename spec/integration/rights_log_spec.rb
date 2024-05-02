@@ -1,14 +1,11 @@
 # frozen_string_literal: true
 
 require "climate_control"
-# require "ffi-icu"
 require "rack/test"
 require "shared_examples"
 
 RSpec.describe "/rights_log" do
   include Rack::Test::Methods
-  # Use ICU collator to try to approximate Sequel's collation of underscore vs Ruby's
-  # let(:collator) { ICU::Collation::Collator.new("en") }
 
   describe "/rights_log/HTID" do
     context "with a valid HTID" do
@@ -34,6 +31,25 @@ RSpec.describe "/rights_log" do
           a[:time] <=> b[:time]
       end
       expect(response[:data]).to eq(sorted)
+    end
+  end
+
+  context "with a cursor" do
+    before(:each) { get(rights_api_endpoint + "rights_log?limit=2") }
+    it_behaves_like "nonempty rights response"
+
+    it "returns a cursor" do
+      response = parse_json(last_response.body)
+      expect(response[:cursor]).to be_a(String)
+    end
+
+    it "produces next page of results when cursor is used" do
+      response_1 = parse_json(last_response.body)
+      cursor = response_1[:cursor]
+      get(rights_api_endpoint + "rights_log?limit=2&cursor=#{cursor}")
+      response_2 = parse_json(last_response.body)
+      expect(response_2[:total]).to eq(response_1[:total])
+      expect(response_2[:start]).to eq(3)
     end
   end
 end

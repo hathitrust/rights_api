@@ -72,8 +72,8 @@ module RightsAPI
         cursor = described_class.new(cursor_string: cursor_string)
         expected = <<~END.delete("\n")
           (rights_current.namespace>'test') OR
-          (rights_current.namespace='test' AND rights_current.id>'cc-by-3.0_google') OR
-          (rights_current.namespace='test' AND rights_current.id='cc-by-3.0_google' AND rights_current.time>'2009-01-01 05:00:00 +0000')
+           (rights_current.namespace='test' AND rights_current.id>'cc-by-3.0_google') OR
+           (rights_current.namespace='test' AND rights_current.id='cc-by-3.0_google' AND rights_current.time>'2009-01-01 05:00:00 +0000')
         END
         expect(cursor.where(model: RightsCurrent, order: RightsCurrent.default_order).first.to_s).to eq(expected)
       end

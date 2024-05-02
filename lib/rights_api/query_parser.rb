@@ -13,7 +13,7 @@ require_relative "order"
 module RightsAPI
   class QueryParser
     DEFAULT_LIMIT = 1000
-    attr_reader :params, :model, :order, :limit
+    attr_reader :params, :model, :where, :order, :limit
 
     # @param model [Class] Sequel::Model subclass for the table being queried
     def initialize(model:)
@@ -43,10 +43,6 @@ module RightsAPI
       self
     end
 
-    def where
-      @where + cursor.where(model: model, order: order)
-    end
-
     def cursor
       @cursor ||= Cursor.new
     end
@@ -68,9 +64,8 @@ module RightsAPI
 
     # Parse cursor value into an auxiliary WHERE clause
     def parse_cursor(values:)
-      # Services[:logger].info "parse_cursor #{values}"
       if values.count > 1
-        raise QueryParserError, "multiple cursor values"
+        raise QueryParserError, "multiple cursor values (#{values})"
       end
       begin
         @cursor = Cursor.new(cursor_string: values.first)
