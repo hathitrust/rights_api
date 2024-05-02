@@ -5,11 +5,8 @@ require "logger"
 
 require_relative "database"
 
-DEFAULT_CACHE_SIZE = 1000
-
 module RightsAPI
   Services = Canister.new
-
   Services.register(:database) do
     Database.new
   end
