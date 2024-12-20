@@ -3,12 +3,10 @@ ARG UNAME=app
 ARG UID=1000
 ARG GID=1000
 
-RUN apt-get update -yqq && apt-get install -yqq --no-install-recommends \
-    netcat-traditional
-
+RUN apt-get update -yqq && apt-get install -yqq --no-install-recommends
 RUN gem install bundler
 
-FROM  base AS production
+FROM base AS production
 COPY --chown=$UID:$GID Gemfile* /usr/src/app/
 
 RUN groupadd -g $GID -o $UNAME
