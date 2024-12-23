@@ -17,9 +17,10 @@ RUN mkdir -p /gems && chown $UID:$GID /gems
 USER $UNAME
 
 COPY --chown=$UID:$GID Gemfile* /usr/src/app/
-COPY --chown=$UID:$GID . /usr/src/app
 
 WORKDIR /usr/src/app
+
+COPY --chown=$UID:$GID . /usr/src/app
 
 RUN bundle install
 
