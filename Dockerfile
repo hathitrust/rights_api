@@ -18,7 +18,6 @@ RUN apt-get update -yqq && apt-get install -yqq --no-install-recommends
 FROM base AS production
 
 ENV BUNDLE_PATH /gems
-ENV APP_ENV test
 
 RUN groupadd -g $GID -o $UNAME
 RUN useradd -m -d /usr/src/app -u $UID -g $GID -o -s /bin/bash $UNAME
