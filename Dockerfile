@@ -30,6 +30,8 @@ COPY --chown=$UID:$GID Gemfile* /usr/src/app/
 WORKDIR /usr/src/app
 
 COPY --chown=$UID:$GID . /usr/src/app
+RUN ls -lha /usr/src/app/
+RUN ls -lha /usr/src/
 
 RUN bundle install
 
