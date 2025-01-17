@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+ENV["APP_ENV"] = "test"
+
 require "simplecov"
 require "simplecov-lcov"
 require "logger"
