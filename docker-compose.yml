@@ -12,7 +12,9 @@ x-healthcheck-defaults: &healthcheck-defaults
 
 services:
   web:
-    build: .
+    build:
+      context: .
+      target: development
     ports:
       - "4567:4567"
     volumes:
