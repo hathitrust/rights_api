@@ -23,7 +23,6 @@ RUN groupadd -g $GID -o $UNAME
 RUN useradd -m -d /usr/src/app -u $UID -g $GID -o -s /bin/bash $UNAME
 RUN mkdir -p /gems && chown $UID:$GID /gems
 
-USER $UNAME
 
 COPY --chown=$UID:$GID Gemfile* /usr/src/app/
 
@@ -32,6 +31,7 @@ WORKDIR /usr/src/app
 COPY --chown=$UID:$GID . /usr/src/app
 RUN chown app:app /usr/src/app
 
+USER $UNAME
 RUN bundle install
 
 CMD ["bundle", "exec", "rackup", "-p", "4567", "-o", "0.0.0.0"]
