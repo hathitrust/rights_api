@@ -18,7 +18,7 @@ SUPPORT_TABLES.each do |table|
     it "has valid #{table} data" do
       response = parse_json(last_response.body)
       response[:data].each do |row|
-        validator = "validate_#{table}_row".to_sym
+        validator = :"validate_#{table}_row"
         send validator, row
       end
     end

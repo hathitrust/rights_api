@@ -13,7 +13,7 @@ module RightsAPI
     # @return [Sequel::SQL::Expression]
     def self.query_for_field(field:)
       return Sequel.join [:a_attr, :a_access_profile], "." if field.to_sym == :attr_access_id
-      super field: field
+      super
     end
 
     def to_h

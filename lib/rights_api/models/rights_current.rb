@@ -27,7 +27,7 @@ module RightsAPI
       if field.to_sym == :htid
         return Sequel.join [qualify(field: :namespace), qualify(field: :id)], "."
       end
-      super field: field
+      super
     end
 
     # rights_current and rights_log should order by timestamp
