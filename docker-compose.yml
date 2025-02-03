@@ -18,7 +18,7 @@ services:
     volumes:
       - .:/usr/src/app
       - gem_cache:/gems
-    command: bundle exec puma -p 4567
+    command: bundle exec rackup --host 0.0.0.0 -p 4567
     environment:
       RIGHTS_API_DATABASE_CONNECTION_STRING: "mysql2://ht_rights:ht_rights@mariadb/ht"
       RIGHTS_API_LOGGER_LEVEL: 1 # Logger::INFO
