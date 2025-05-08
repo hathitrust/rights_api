@@ -10,7 +10,7 @@ module RightsAPI
     many_to_one :attribute_obj, class: :"RightsAPI::Attribute", key: :attr
     many_to_one :reason_obj, class: :"RightsAPI::Reason", key: :reason
     many_to_one :source_obj, class: :"RightsAPI::Source", key: :source
-    set_primary_key [:namespace, :id]
+    set_primary_key [:namespace, :id, :time]
 
     # Maybe TOO eager. This makes us partially responsible for the fact that rights_current.source
     # has an embedded access_profile.
@@ -31,10 +31,14 @@ module RightsAPI
       super
     end
 
-    # rights_current and rights_log should order by timestamp
-    # @return [Sequel::SQL::Expression]
+    # rights_current and rights_log should order by htid, timestamp
+    # @return [Array<RightsAPI::Order>]
     def self.default_order
-      qualify field: :time
+      [
+        Order.new(column: :namespace),
+        Order.new(column: :id),
+        Order.new(column: :time)
+      ]
     end
 
     def to_h

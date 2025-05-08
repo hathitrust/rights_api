@@ -1,16 +1,15 @@
 # frozen_string_literal: true
 
 require "benchmark"
-require "cgi"
 
+require_relative "cursor"
 require_relative "error"
 require_relative "query_parser"
 require_relative "result"
-require_relative "services"
 
 module RightsAPI
   class Query
-    attr_reader :model, :params, :parser, :total, :dataset
+    attr_reader :model, :params, :parser, :total
 
     # @param model [Class] Sequel::Model subclass for the table being queried
     # @param params [Hash] CGI parameters submitted to the Sinatra frontend
@@ -19,28 +18,34 @@ module RightsAPI
       @params = params
       @parser = QueryParser.new(model: model)
       @total = 0
-      @dataset = nil
     end
 
     # @return [Result]
     def run
+      dataset = nil
       # This may raise QueryParserError
       parser.parse(params: params)
       time_delta = Benchmark.realtime do
-        @dataset = model.base_dataset
+        dataset = model.base_dataset
         parser.where.each do |where|
-          @dataset = dataset.where(where)
+          dataset = dataset.where(where)
         end
-        # Save this here because offset and limit may alter the count.
+        dataset = dataset.order(*(parser.order.map { |order| order.to_sequel(model: model) }))
+        # Save this here because limit and cursor would otherwise alter the count.
         @total = dataset.count
-        @dataset = dataset.order(*parser.order)
-          .offset(parser.offset)
-          .limit(parser.limit)
-          .all
+        # Apply the cursor to get to the offset we want
+        parser.cursor.where(model: model, order: parser.order).each do |where|
+          dataset = dataset.where(where)
+        end
+        dataset = dataset.limit(parser.limit).all
       end
-      result = Result.new(offset: parser.offset, total: total, milliseconds: 1000 * time_delta)
+      result = Result.new(offset: parser.cursor.offset, total: total, milliseconds: 1000 * time_delta)
       dataset.each do |row|
         result.add! row: row.to_h
+      end
+      if result.more?
+        cursor = parser.cursor.encode(order: parser.order, rows: dataset)
+        result.cursor = cursor
       end
       result
     end

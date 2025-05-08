@@ -2,7 +2,9 @@
 
 require "sequel"
 
+require_relative "cursor"
 require_relative "error"
+require_relative "order"
 
 # Processes the Hash of URL parameters passed to the API into an
 # Array of WHERE constraints, as well as LIMIT, and OFFSET values.
@@ -11,16 +13,15 @@ require_relative "error"
 module RightsAPI
   class QueryParser
     DEFAULT_LIMIT = 1000
-    DEFAULT_OFFSET = 0
-    attr_reader :params, :model, :where, :order, :offset, :limit
+    attr_reader :params, :model, :where, :order, :limit
 
     # @param model [Class] Sequel::Model subclass for the table being queried
     def initialize(model:)
       @model = model
       @where = []
       @order = []
+      @cursor = nil
       @limit = DEFAULT_LIMIT
-      @offset = DEFAULT_OFFSET
     end
 
     def parse(params: {})
@@ -28,16 +29,22 @@ module RightsAPI
       params.each do |key, values|
         key = key.to_sym
         case key
-        when :offset
-          parse_offset(values: values)
+        when :cursor
+          parse_cursor(values: values)
         when :limit
           parse_limit(values: values)
         else
           parse_parameter(key: key, values: values)
         end
       end
-      @order = [model.default_order] if @order.empty?
+      # Always tack on the default order even if it is redundant.
+      # The cursor implementation requires that there be an intrinsic order.
+      @order += model.default_order
       self
+    end
+
+    def cursor
+      @cursor ||= Cursor.new
     end
 
     private
@@ -55,9 +62,16 @@ module RightsAPI
       end
     end
 
-    # Extract a single integer that can be passed to dataset.offset.
-    def parse_offset(values:)
-      @offset = parse_int_value(values: values, type: "OFFSET")
+    # Parse cursor value into an auxiliary WHERE clause
+    def parse_cursor(values:)
+      if values.count > 1
+        raise QueryParserError, "multiple cursor values (#{values})"
+      end
+      begin
+        @cursor = Cursor.new(cursor_string: values.first)
+      rescue ArgumentError => e
+        raise QueryParserError, "cannot decode cursor: #{e.message}"
+      end
     end
 
     # Extract a single integer that can be passed to dataset.limit.
@@ -72,6 +86,8 @@ module RightsAPI
     # @param type [String] "OFFSET" or "LIMIT", used only for reporting errors.
     # @return [Integer]
     def parse_int_value(values:, type:)
+      return values.last if values.last.is_a? Integer
+
       value = values.last.to_i
       # Make sure the offset can make a round-trip conversion between Int and String
       # https://stackoverflow.com/a/1235891

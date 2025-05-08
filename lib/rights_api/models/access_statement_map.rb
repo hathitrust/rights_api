@@ -9,6 +9,13 @@ module RightsAPI
       :attr_access_id
     end
 
+    def self.default_order
+      [
+        Order.new(column: :a_attr),
+        Order.new(column: :a_access_profile)
+      ]
+    end
+
     # @param [String, Symbol] field
     # @return [Sequel::SQL::Expression]
     def self.query_for_field(field:)
