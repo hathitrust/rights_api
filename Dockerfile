@@ -34,4 +34,4 @@ RUN chown app:app /usr/src/app
 USER $UNAME
 RUN bundle install
 
-CMD ["bundle", "exec", "rackup", "-p", "4567", "-o", "0.0.0.0"]
+CMD ["bundle", "exec", "puma", "-p", "4567", "config.ru"]
