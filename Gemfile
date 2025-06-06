@@ -1,5 +1,6 @@
 source "https://rubygems.org"
 
+gem "benchmark"
 gem "canister"
 gem "climate_control"
 gem "json"

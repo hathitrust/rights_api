@@ -15,6 +15,8 @@ require_relative "schema"
 
 module RightsAPI
   class App < Sinatra::Base
+    set :logging, true
+
     # Redirect to the current version
     get "/" do
       redirect(request.url + "v1/")
