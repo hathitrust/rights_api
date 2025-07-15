@@ -16,7 +16,7 @@ module RightsAPI
   end
 
   Services.register(:database_connection) do
-    Services[:database].connect.tap do |connection|
+    Services[:database].connection.tap do |connection|
       connection.logger = Services[:logger]
     end
   end
