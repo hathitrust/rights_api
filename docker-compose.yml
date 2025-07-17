@@ -20,7 +20,10 @@ services:
       - gem_cache:/gems
     command: bundle exec puma -p 4567 config.ru
     environment:
-      RIGHTS_API_DATABASE_CONNECTION_STRING: "mysql2://ht_rights:ht_rights@mariadb/ht"
+      MARIADB_HT_RO_USERNAME: ht_rights
+      MARIADB_HT_RO_PASSWORD: ht_rights
+      MARIADB_HT_RO_HOST: mariadb
+      MARIADB_HT_RO_DATABASE: ht
       RIGHTS_API_LOGGER_LEVEL: 1 # Logger::INFO
     depends_on:
       mariadb: *healthy
