@@ -15,6 +15,7 @@ module RightsAPI
         database: ENV["MARIADB_HT_RO_DATABASE"],
         encoding: "utf8mb4"
       )
+      # Check once every few seconds that we're actually connected and reconnect if necessary
       @connection.extension(:connection_validator)
       @connection.pool.connection_validation_timeout = 5
     end

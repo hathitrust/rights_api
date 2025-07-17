@@ -9,7 +9,7 @@ RSpec.describe RightsAPI::Database do
     end
   end
 
-  describe "#connect" do
+  describe "#connection" do
     it "connects with ENV variables" do
       env = {
         MARIADB_HT_RO_USERNAME: "mdp-admin",
