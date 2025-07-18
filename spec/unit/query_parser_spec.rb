@@ -1,11 +1,8 @@
 # frozen_string_literal: true
 
-require "sequel"
-
 module RightsAPI
   RSpec.describe(QueryParser) do
     let(:query_parser) { described_class.new(model: Attribute) }
-    # let(:id_query) { described_class.new(params: "id=some+id", table_name: "rights") }
 
     describe ".new" do
       it "creates a #{described_class}" do
@@ -13,23 +10,23 @@ module RightsAPI
       end
 
       it "has the expected attribute readers" do
-        %i[model where order offset limit].each do |reader|
+        %i[model where order limit].each do |reader|
           expect(query_parser.send(reader)).not_to be_nil
         end
       end
     end
 
     describe "#parse" do
-      it "parses empty query into zero WHERE clauses" do
-        expect(query_parser.parse.where.count).to eq(0)
+      it "parses cursor" do
+        expect(query_parser.parse(params: {cursor: [VALID_CURSOR]}).cursor).to be_a(RightsAPI::Cursor)
       end
 
-      it "parses id query into one WHERE clause" do
-        expect(query_parser.parse(params: {id: ["1"]}).where.count).to eq(1)
+      it "raises on bogus cursor" do
+        expect { query_parser.parse(params: {cursor: [INVALID_CURSOR]}) }.to raise_error(QueryParserError)
       end
 
-      it "parses OFFSET query" do
-        expect(query_parser.parse(params: {offset: ["1"]}).offset).to eq(1)
+      it "raises on multiple cursors" do
+        expect { query_parser.parse(params: {cursor: [VALID_CURSOR, ANOTHER_VALID_CURSOR]}) }.to raise_error(QueryParserError)
       end
 
       it "parses LIMIT query" do
@@ -39,9 +36,11 @@ module RightsAPI
       it "raises on bogus LIMIT queries" do
         expect { query_parser.parse(params: {limit: ["a"]}) }.to raise_error(QueryParserError)
       end
+    end
 
-      it "raises on bogus OFFSET queries" do
-        expect { query_parser.parse(params: {offset: ["a"]}) }.to raise_error(QueryParserError)
+    describe "#cursor" do
+      it "returns a RightsAPI::Cursor" do
+        expect(query_parser.cursor).to be_a(RightsAPI::Cursor)
       end
     end
   end

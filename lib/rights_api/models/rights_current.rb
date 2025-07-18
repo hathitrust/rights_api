@@ -30,10 +30,14 @@ module RightsAPI
       super
     end
 
-    # rights_current and rights_log should order by timestamp
-    # @return [Sequel::SQL::Expression]
+    # rights_current and rights_log should order by htid, timestamp
+    # @return [Array<RightsAPI::Order>]
     def self.default_order
-      qualify field: :time
+      [
+        Order.new(column: :namespace),
+        Order.new(column: :id),
+        Order.new(column: :time)
+      ]
     end
 
     def to_h
