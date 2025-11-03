@@ -103,13 +103,13 @@ The test suite is divided into unit and integration tests which can be run separ
 give some orthogonality in checking for coverage gaps.
 ```
 # Full test suite
-docker-compose run --rm test
+docker-compose run --rm web
 # Standard
-docker-compose run --rm test bundle exec standardrb
+docker-compose run --rm web bundle exec standardrb
 # Unit
-docker-compose run --rm test bundle exec rspec spec/unit
+docker-compose run --rm web bundle exec rspec spec/unit
 # Integration
-docker-compose run --rm test bundle exec rspec spec/integration
+docker-compose run --rm web bundle exec rspec spec/integration
 ```
 
 ## Debugging

@@ -3,6 +3,7 @@
 module RightsAPI
   class Source < Sequel::Model
     extend ModelExtensions
+
     # one_to_many :rights_current, model: "RightsAPI::RightsCurrent".to_sym, key: :source
     # one_to_many :rights_log, model: "RightsAPI::RightsCurrent".to_sym, key: :source
     many_to_one :access_profile_obj, class: :"RightsAPI::AccessProfile", key: :access_profile
