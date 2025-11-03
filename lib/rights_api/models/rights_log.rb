@@ -3,6 +3,7 @@
 module RightsAPI
   class RightsLog < Sequel::Model(:rights_log)
     extend ModelExtensions
+
     # The obnoxious *_obj naming convention arises from the fact that apparently
     # Sequel wants our foreign keys to be of the form attribute_id, reason_id, etc.
     # but of course they're not, so much silliness ensues.
