@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 gem "benchmark"
 gem "canister"
-gem "climate_control"
+gem "cgi"
 gem "json"
 gem "mysql2"
 gem "puma"
@@ -12,7 +12,8 @@ gem "sinatra"
 gem "sinatra-contrib"
 
 group :development, :test do
-  gem "pry"
+  gem "climate_control"
+  gem "debug"
   gem "standard"
   gem "rspec"
   gem "rack-test"
