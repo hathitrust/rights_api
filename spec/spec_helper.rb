@@ -6,7 +6,7 @@ require "simplecov"
 require "simplecov-lcov"
 require "logger"
 
-SimpleCov.add_filter "spec"
+SimpleCov.skip "spec"
 
 SimpleCov::Formatter::LcovFormatter.config do |c|
   c.report_with_single_file = true
